@@ -1,0 +1,20 @@
+{
+  "name": "@lattice/gh-scripts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reproducible governance scripts for the Lattice repo. Reads YAML config from .github/ and pushes it into GitHub via the `gh` CLI.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync-labels": "node sync-labels.mjs",
+    "sync-milestones": "node sync-milestones.mjs",
+    "bootstrap-repo": "node bootstrap-repo.mjs",
+    "bootstrap-project": "node bootstrap-project.mjs",
+    "bootstrap-issues": "node bootstrap-issues.mjs"
+  },
+  "dependencies": {
+    "yaml": "^2.5.1"
+  }
+}
