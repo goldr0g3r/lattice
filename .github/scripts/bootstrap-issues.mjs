@@ -150,8 +150,11 @@ async function setSingleSelectField(projectId, itemId, fieldId, optionId) {
   `);
 }
 
+// Status and Milestone fields are managed by GitHub (auto-created on the
+// project). We only set Area / Priority / Size on the custom SingleSelects
+// that bootstrap-project.mjs created. The repo Milestone we passed to
+// `gh issue create --milestone` will surface in the auto Milestone field.
 function deriveFieldValues(spec) {
-  const milestoneShort = spec.milestone.split(" — ")[0]; // "v0.1 — Foundation" → "v0.1"
   const area =
     spec.labels.map((l) => l.match(/^area\/(.+)$/)?.[1]).find(Boolean) ?? null;
   const priority =
@@ -161,8 +164,6 @@ function deriveFieldValues(spec) {
     spec.labels.map((l) => l.match(/^size\/(.+)$/)?.[1]).find(Boolean) ?? null;
   const size = sizeRaw ? sizeRaw.toUpperCase() : null;
   return {
-    Status: "Backlog",
-    Milestone: milestoneShort,
     Area: area,
     Priority: priority,
     Size: size,
