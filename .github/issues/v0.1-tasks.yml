@@ -1,0 +1,212 @@
+# Lattice — fine-grained v0.1 task issues.
+#
+# Created by `.github/scripts/bootstrap-issues.mjs` (second pass, after epics).
+# Each `epic` references the title of the parent issue in epics.yml.
+# `good-first-issue: true` adds the "good first issue" label.
+
+- title: "feat(repo): pnpm + Turborepo monorepo scaffolding"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/ci", "priority/p1", "size/m"]
+  body: |
+    Bootstrap the JS/TS monorepo per [ARCHITECTURE.md](../ARCHITECTURE.md)
+    repo layout, locked in by [ADR-0008](../docs/decisions/0008-pnpm-turborepo-monorepo.md).
+
+    ## Acceptance
+
+    - [ ] `pnpm install` from repo root hydrates all packages
+    - [ ] `turbo run build` is a no-op (no apps yet) without errors
+    - [ ] Rust workspace `Cargo.toml` lists all `core/*` crates
+    - [ ] Root scripts: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format`
+    - [ ] `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`, `.nvmrc`, `.npmrc` committed
+    - [ ] `package.json` pins `packageManager: pnpm@9.x.y`
+
+- title: "feat(desktop): Tauri 2 shell builds on Windows + Linux in CI"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/ci", "area/core", "priority/p1", "size/l"]
+  body: |
+    Stand up the desktop Tauri 2 shell so we can run a Hello-Lattice
+    window on both platforms, per [ADR-0001](../docs/decisions/0001-tauri-2-cross-platform-shell.md).
+
+    ## Acceptance
+
+    - [ ] `apps/desktop/` boots with a centred Lattice wordmark in serif
+    - [ ] Theme toggle in top-right; light/dark from
+          [ADR-0010](../docs/decisions/0010-design-tokens-and-typography.md)
+    - [ ] "Open vault…" button opens a folder picker (no parsing yet)
+    - [ ] `pnpm tauri build --debug` succeeds on Ubuntu and Windows runners
+    - [ ] Cold-start measured in the same CI job, <1.5 s on a runner
+
+- title: "feat(ui): React + Vite + TailwindCSS + shadcn/ui scaffolding"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/ui", "priority/p1", "size/m"]
+  body: |
+    Set up the frontend toolchain inside `apps/desktop` and the shared
+    `packages/ui` design-system package.
+
+    ## Acceptance
+
+    - [ ] Vite + React 18 + TS-strict configured in `apps/desktop`
+    - [ ] Tailwind preset in `packages/config/tailwind-preset`
+    - [ ] `packages/ui` exposes shadcn primitives: button, card, dialog,
+          dropdown, input, separator, sheet, tabs, tooltip, toast, command
+    - [ ] Storybook story per primitive (one-liner if time-pressed)
+
+- title: "feat(core): Rust core crate with sqlx + SQLite schema migration"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/core", "priority/p1", "size/l"]
+  body: |
+    Bring up `core/lattice-core` per [ADR-0002](../docs/decisions/0002-rust-core-sqlx-sqlite.md).
+
+    ## Acceptance
+
+    - [ ] `core/lattice-core` compiles; `cargo test --workspace` green
+    - [ ] `sqlx::migrate!()` runs against a fresh SQLite database
+    - [ ] Schema includes: notes, tags, links, attachments tables (per
+          [ARCHITECTURE.md](../ARCHITECTURE.md))
+    - [ ] `ts-rs`-generated bindings emitted into `packages/core-bindings`
+    - [ ] One `insta` snapshot test on the JSON shape of an error type
+
+- title: "feat(core): vault open / create / switch"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/core", "priority/p1", "size/m"]
+  body: |
+    Implement the Vault concept — open, create, or switch a folder of
+    Markdown files. The vault is the top-level user concept in Lattice.
+
+    ## Acceptance
+
+    - [ ] `vault.open(path)` Tauri command exists and returns a typed Vault
+    - [ ] `vault.create(path)` initialises `.lattice/` subdirectory
+    - [ ] `vault.switch(path)` cleanly closes the old vault and opens the new
+    - [ ] Last-opened path persisted in OS-appropriate config dir
+    - [ ] Error cases tested: path doesn't exist, not a directory, no permission
+
+- title: "feat(core): file watcher + reactive index"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/core", "priority/p1", "size/m"]
+  body: |
+    React to external edits the way Obsidian does — if the user edits
+    a `.md` in `vim`, Lattice picks it up.
+
+    ## Acceptance
+
+    - [ ] `notify` crate wired into `core/lattice-core`
+    - [ ] Debounced (200 ms) re-index on save
+    - [ ] Tauri event emitted to the frontend so the UI can refresh
+    - [ ] Integration test: write file → expect index update event
+
+- title: "feat(core): structured logging, error model, telemetry opt-in"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/core", "priority/p2", "size/m"]
+  body: |
+    Foundations the rest of v0.1 will lean on.
+
+    ## Acceptance
+
+    - [ ] `tracing` + `tracing-subscriber` configured; log file under
+          `~/MyVault/.lattice/logs/` rotated daily
+    - [ ] All public APIs return `Result<T, LatticeError>` (thiserror)
+    - [ ] Telemetry: **off by default**, opt-in via a Settings checkbox.
+          When opted in, sends anonymous crash + perf events to a
+          self-hostable endpoint. Document the schema in `docs/telemetry.md`.
+
+- title: "feat(ui): initial visual identity — typography, logo, app icon"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/ui", "area/ux", "priority/p2", "size/m"]
+  body: |
+    Land the Lattice brand inside the app shell.
+
+    ## Acceptance
+
+    - [ ] Self-hosted fonts via `@fontsource/{newsreader,inter,jetbrains-mono}`
+    - [ ] Lattice wordmark SVG in `packages/ui/src/assets/`
+    - [ ] App icon (PNG @ 256/512/1024) in `apps/desktop/icons/`
+    - [ ] Splash screen on cold start (max 800 ms before window paints)
+    - [ ] Token CSS variables from
+          [ADR-0010](../docs/decisions/0010-design-tokens-and-typography.md)
+          live in `packages/ui/src/tokens.css`
+
+- title: "ci(repo): tighten CI baseline once monorepo scaffolds"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/chore", "area/ci", "priority/p2", "size/s"]
+  body: |
+    The baseline CI in `.github/workflows/ci.yml` skips frontend and
+    rust jobs when their config files don't exist (so it stays green on
+    docs-only PRs). Once PR #7 (monorepo skeleton) lands, the actual
+    checks light up. This issue tracks the follow-ups.
+
+    ## Acceptance
+
+    - [ ] `frontend` job runs `pnpm lint && pnpm typecheck && pnpm test`
+          on every PR, matrix `[ubuntu-latest, windows-latest]`
+    - [ ] `rust` job runs `cargo fmt --check && cargo clippy -D warnings
+          && cargo test --workspace`, matrix `[ubuntu-latest, windows-latest]`
+    - [ ] Re-apply branch protection to require `frontend (ubuntu-latest)`,
+          `frontend (windows-latest)`, `rust (ubuntu-latest)`,
+          `rust (windows-latest)` in addition to `ci / meta` and `commitlint`
+
+- title: "docs(adr): track follow-up ADRs spawned by v0.1 implementation"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/docs", "area/docs", "priority/p3", "size/s"]
+  good-first-issue: true
+  body: |
+    As we implement v0.1 we'll hit non-obvious decisions worth recording.
+    This issue tracks which ones become their own ADRs.
+
+    ## Candidates
+
+    - [ ] ADR-0011 — font-loading strategy (subset, swap, FOUT)
+    - [ ] ADR-0012 — telemetry-event schema versioning
+    - [ ] ADR-0013 — vault-conflict resolution UX (last-writer-wins vs prompt)
+    - [ ] ADR-0014 — file-watcher debounce window
+
+    ## Acceptance
+
+    - [ ] Each accepted candidate has a merged ADR PR
+    - [ ] `docs/decisions/README.md` index is updated
+
+- title: "feat(ui): design-token round-trip from packages/ui to Tailwind preset"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/ui", "priority/p2", "size/s"]
+  good-first-issue: true
+  body: |
+    The CSS variables from
+    [ADR-0010](../docs/decisions/0010-design-tokens-and-typography.md) live
+    in two places (CSS variables + Tailwind preset). Make the Tailwind
+    preset read from the same source so they can't drift.
+
+    ## Acceptance
+
+    - [ ] `packages/config/tailwind-preset/index.cjs` resolves `bg-bg-canvas`,
+          `text-text-primary`, `border-border`, etc. to `var(--...)`
+    - [ ] One Vitest unit test exercising the resolved class strings
+    - [ ] CONTRIBUTING note: "to add a new token, edit both `tokens.css`
+          and the preset" + a CI check to compare keys
+
+- title: "perf(core): criterion bench harness for v0.1 perf budgets"
+  milestone: "v0.1 — Foundation"
+  epic: "Epic: v0.1 — Foundation"
+  labels: ["type/feature", "area/core", "area/ci", "priority/p2", "size/m"]
+  body: |
+    The perf budgets in [ARCHITECTURE.md](../ARCHITECTURE.md) need to
+    stop being a wiki promise.
+
+    ## Acceptance
+
+    - [ ] `cargo bench --workspace` runs in CI on a dedicated job
+          (allowed to fail until baselines exist, then required)
+    - [ ] Benches for: vault open (10k notes), save+index (1 note),
+          file-watcher tick latency
+    - [ ] Baselines committed under `core/lattice-core/benches/baselines/`
+    - [ ] CI fails on >10% regression vs baseline

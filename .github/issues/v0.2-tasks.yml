@@ -1,0 +1,107 @@
+# Lattice — fine-grained v0.2 task issues.
+#
+# Pre-cut so contributors can pick something up while v0.1 is in flight.
+
+- title: "feat(editor): TipTap block editor with slash command menu"
+  milestone: "v0.2 — The Editor"
+  epic: "Epic: v0.2 — The Editor"
+  labels: ["type/feature", "area/editor", "priority/p2", "size/l"]
+  body: |
+    Bring up the core editor per [ADR-0003](../docs/decisions/0003-tiptap-prosemirror-editor.md).
+
+    ## Acceptance
+
+    - [ ] `packages/editor/` exports a TipTap instance configured with our
+          schema (paragraphs, headings 1-6, lists, quotes, callouts, code
+          blocks, tables, hr)
+    - [ ] Slash command menu (`/`) opens at the caret with keyboard-only
+          navigation, fuzzy filter, and a confirmable insert
+    - [ ] Slash menu opens in <16 ms on a 1 000-note vault
+    - [ ] Storybook story showing all block types
+
+- title: "feat(editor): CodeMirror 6 embedded in code-block nodes"
+  milestone: "v0.2 — The Editor"
+  epic: "Epic: v0.2 — The Editor"
+  labels: ["type/feature", "area/editor", "priority/p2", "size/m"]
+  body: |
+    Make code blocks first-class — real syntax highlighting, real
+    keyboard support inside the block.
+
+    ## Acceptance
+
+    - [ ] A code-block node renders a CodeMirror 6 instance, not a `<pre>`
+    - [ ] Language selector dropdown at the top of the block
+    - [ ] At least 20 languages preloaded; rest lazy-loaded
+    - [ ] Search / multi-cursor / indent work inside the block
+    - [ ] Round-trips losslessly to MD ``` fences
+
+- title: "feat(editor): Markdown round-trip + golden-corpus test suite"
+  milestone: "v0.2 — The Editor"
+  epic: "Epic: v0.2 — The Editor"
+  labels: ["type/feature", "area/editor", "area/core", "priority/p1", "size/l"]
+  body: |
+    The contract called out in
+    [ADR-0003](../docs/decisions/0003-tiptap-prosemirror-editor.md) and
+    [ADR-0006](../docs/decisions/0006-local-first-plain-markdown.md).
+
+    ## Acceptance
+
+    - [ ] Parser + serializer pair in `core/lattice-core` (Rust) and
+          a mirror in `packages/editor` (TS) so the editor doesn't
+          touch disk
+    - [ ] `tests/markdown-roundtrip/` corpus of pathological inputs:
+          tables with pipes in code, nested HTML, footnotes,
+          list-in-blockquote, frontmatter edge cases, hard-line-breaks
+    - [ ] CI gate: every corpus file round-trips byte-identical
+    - [ ] When a corpus file is updated, the test prints the diff cleanly
+
+- title: "feat(editor): [[wiki-link]] autocomplete + click-to-navigate"
+  milestone: "v0.2 — The Editor"
+  epic: "Epic: v0.2 — The Editor"
+  labels: ["type/feature", "area/editor", "priority/p2", "size/m"]
+  body: |
+    Wiki-links are the social glue of the vault. Make them feel native.
+
+    ## Acceptance
+
+    - [ ] Typing `[[` opens a suggestion menu over existing note titles
+    - [ ] Fuzzy match + recently-edited bias
+    - [ ] Picking a suggestion inserts `[[Note Title]]`
+    - [ ] Clicking a wiki-link navigates to the target (or, if absent,
+          creates the note and opens it)
+    - [ ] Round-trips through Markdown as `[[Note Title]]` (no escaping
+          surprises)
+
+- title: "feat(editor): KaTeX, Mermaid, Excalidraw embeds"
+  milestone: "v0.2 — The Editor"
+  epic: "Epic: v0.2 — The Editor"
+  labels: ["type/feature", "area/editor", "priority/p2", "size/l"]
+  body: |
+    The three "engineer killers" — math, diagrams, sketches.
+
+    ## Acceptance
+
+    - [ ] Inline `$...$` and block `$$...$$` math render via KaTeX
+    - [ ] Fenced ` ```mermaid ` blocks render via the Mermaid library
+    - [ ] An Excalidraw node embeds a small inline drawing canvas;
+          serialises to `excalidraw.json` + a PNG snapshot in `attachments/`
+    - [ ] All three round-trip through MD
+
+- title: "feat(ux): command palette (⌘K / Ctrl+K)"
+  milestone: "v0.2 — The Editor"
+  epic: "Epic: v0.2 — The Editor"
+  labels: ["type/feature", "area/ux", "area/ui", "priority/p2", "size/m"]
+  good-first-issue: true
+  body: |
+    The keyboard-first power-user surface. A single hot-key for every
+    action in the app.
+
+    ## Acceptance
+
+    - [ ] ⌘K (macOS-style) and Ctrl+K open the command palette
+          (shadcn `command` primitive)
+    - [ ] Commands registered: open vault, switch vault, new note,
+          toggle theme, open settings, run search, jump to note,
+          insert wiki-link, toggle command palette itself
+    - [ ] Fuzzy match across command names and keywords
+    - [ ] Custom commands registerable from plugins (post-v0.9 SDK)

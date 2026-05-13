@@ -1,0 +1,69 @@
+# Lattice — milestone-as-code (source of truth).
+#
+# Mirrored into GitHub by `.github/scripts/sync-milestones.mjs`.
+# One milestone per minor version, matching ROADMAP.md.
+#
+# `state` is `open` (default) or `closed`. Do not set `due_on` here;
+# that's a property we maintain in GitHub UI as cadence becomes clearer.
+
+- title: "v0.1 — Foundation"
+  state: open
+  description: >-
+    Skeleton, monorepo, Tauri 2 shell, Rust core, vault FS, MD parse + render,
+    file watcher, telemetry opt-in, visual identity. No editor yet.
+
+- title: "v0.2 — The Editor"
+  state: open
+  description: >-
+    TipTap blocks, slash commands, CodeMirror 6, Markdown round-trip,
+    wiki-links, KaTeX / Mermaid / Excalidraw, command palette.
+
+- title: "v0.3 — Navigation, Search, Graph"
+  state: open
+  description: >-
+    Tantivy index + search modal, backlinks, tag / folder tree,
+    Cytoscape graph view, daily notes.
+
+- title: "v0.4 — AI Panel"
+  state: open
+  description: >-
+    Provider abstraction (OpenAI / Anthropic / Ollama), RAG-over-vault
+    with local embeddings, per-note actions, prompt library, BYO-key.
+
+- title: "v0.5 — Sync (Self-hostable)"
+  state: open
+  description: >-
+    Yjs/yrs editor doc model, Axum sync server, S3-compatible blob store,
+    libsodium E2EE, conflict-free multi-device editing.
+
+- title: "v0.6 — Android"
+  state: open
+  description: >-
+    Tauri 2 Android build, touch-first UI, share-sheet integration,
+    offline-first, F-Droid distribution.
+
+- title: "v0.7 — Engineering & ML superpowers"
+  state: open
+  description: >-
+    .ipynb import + render, Dataset / Model / Experiment typed blocks,
+    DOI / arXiv lookup, citation graph, code-aware backlinks into Git.
+
+- title: "v0.8 — Bookmarking"
+  state: open
+  description: >-
+    Browser extension (Chrome / Firefox / Edge), Readability extraction,
+    offline archive, YouTube / podcast clipper, read-later queue.
+
+- title: "v0.9 — Power features"
+  state: open
+  description: >-
+    Git-style time-travel per note, live canvas (Excalidraw-derived),
+    DuckDB-on-SQLite SQL queries over notes, WASM plugin SDK,
+    theme marketplace.
+
+- title: "v1.0 — Public Beta"
+  state: open
+  description: >-
+    Performance budgets enforced, accessibility audit (WCAG 2.2 AA),
+    i18n scaffolding, signed installers + auto-update,
+    public beta launch.
