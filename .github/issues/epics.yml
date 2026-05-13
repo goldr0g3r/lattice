@@ -1,0 +1,265 @@
+# Lattice — epic tracking issues (one per milestone).
+#
+# Created by `.github/scripts/bootstrap-issues.mjs` (first pass).
+# After child tasks exist, the script re-edits each `body` and replaces
+# `<!-- AUTO:CHILDREN -->` with a checklist of child issue references.
+#
+# Fields:
+#   - title:         issue title
+#   - milestone:     must match a title in milestones.yml
+#   - labels:        list of strings, must match labels.yml
+#   - body:          GitHub-Flavored Markdown
+#   - good-first-issue: omitted by default (epics are never starters)
+
+- title: "Epic: v0.1 — Foundation"
+  milestone: "v0.1 — Foundation"
+  labels: ["type/task", "priority/p1", "size/xl"]
+  body: |
+    Tracking issue for milestone **v0.1 — Foundation**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] pnpm + Turborepo monorepo (`apps/desktop`, `packages/ui`, …, `core/` Rust workspace)
+    - [ ] Tauri 2 desktop shell builds on Windows + Linux in CI
+    - [ ] React + Vite + TailwindCSS + shadcn/ui set up
+    - [ ] Rust `core/` crate with SQLite schema migration (`sqlx`)
+    - [ ] Vault concept: open / create / switch a folder of Markdown files
+    - [ ] Basic file watcher (`notify`) + reactive index
+    - [ ] Logging, error model, telemetry opt-in
+    - [ ] Initial visual identity: typography, color tokens, Lattice logo
+
+    ## Definition of done
+
+    - `pnpm install && pnpm tauri dev` launches the shell with the Lattice
+      wordmark and a working light/dark theme toggle in <1.5 s cold start.
+    - `cargo test --workspace` is green.
+    - At least one note can be opened from a vault folder and rendered as
+      read-only Markdown.
+    - All v0.1 perf budgets ([ARCHITECTURE.md](../ARCHITECTURE.md)) have a
+      `criterion` bench gating CI.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.2 — The Editor"
+  milestone: "v0.2 — The Editor"
+  labels: ["type/task", "priority/p2", "size/xl", "area/editor"]
+  body: |
+    Tracking issue for milestone **v0.2 — The Editor**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] TipTap block editor (paragraphs, headings, lists, quotes, code blocks)
+    - [ ] Slash command menu
+    - [ ] CodeMirror 6 embedded code blocks with syntax highlighting
+    - [ ] Markdown round-trip (parse on load, serialize on save) — no data loss
+    - [ ] `[[Wiki links]]` autocomplete + click-to-navigate
+    - [ ] LaTeX (KaTeX), Mermaid, Excalidraw embeds
+    - [ ] Drag-and-drop images (stored as files next to the note)
+    - [ ] Command palette (⌘K / Ctrl+K)
+
+    ## Definition of done
+
+    - A user can write, save, and reload a Markdown note with all v0.2
+      block types without data loss (verified by the
+      `tests/markdown-roundtrip/` golden corpus).
+    - Slash command menu opens in <16 ms on a 1 000-note vault.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.3 — Navigation, Search, Graph"
+  milestone: "v0.3 — Navigation, Search, Graph"
+  labels: ["type/task", "priority/p2", "size/xl"]
+  body: |
+    Tracking issue for milestone **v0.3 — Navigation, Search, Graph**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Full-text index with Tantivy; live re-indexing on save
+    - [ ] Search modal with operators (`tag:`, `path:`, `created:`, fuzzy)
+    - [ ] Backlinks panel + unlinked-mention detection
+    - [ ] Tag tree, folder tree, favorites, pinned
+    - [ ] Local + global graph view (Cytoscape.js)
+    - [ ] Daily-notes plugin
+
+    ## Definition of done
+
+    - Search across a 10 000-note vault returns in <30 ms p99.
+    - Backlinks panel updates within 1 second of saving a note.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.4 — AI Panel"
+  milestone: "v0.4 — AI Panel"
+  labels: ["type/task", "priority/p2", "size/xl", "area/ai"]
+  body: |
+    Tracking issue for milestone **v0.4 — AI Panel**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Pluggable AI provider system (OpenAI, Anthropic, Ollama)
+    - [ ] Chat-with-your-vault (local embeddings via `fastembed-rs`, RAG)
+    - [ ] Per-note actions: summarize, generate flashcards, find related
+    - [ ] AI-suggested tags + titles
+    - [ ] Prompt library (user-editable)
+    - [ ] Privacy: nothing leaves the device unless explicitly enabled
+
+    ## Definition of done
+
+    - A user can chat with their vault using a local Ollama model with
+      zero network egress.
+    - A user can BYO key for OpenAI / Anthropic; key is stored in OS keychain.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.5 — Sync (Self-hostable)"
+  milestone: "v0.5 — Sync (Self-hostable)"
+  labels: ["type/task", "priority/p2", "size/xl", "area/sync"]
+  body: |
+    Tracking issue for milestone **v0.5 — Sync (Self-hostable)**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] CRDT data layer (Yjs / `yrs`) backing the editor doc model
+    - [ ] Reference sync server (Axum + `y-sync` over WebSocket)
+    - [ ] S3-compatible blob store for media
+    - [ ] E2EE with libsodium; user holds the keys
+    - [ ] Conflict-free multi-device editing
+    - [ ] One-tap deploy guides (Fly.io, Railway, Docker)
+
+    ## Definition of done
+
+    - Two devices editing the same note offline converge on reconnect
+      with no data loss and no manual conflict resolution.
+    - Sync server image deploys from `Dockerfile` to a fresh VPS in <5 min.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.6 — Android"
+  milestone: "v0.6 — Android"
+  labels: ["type/task", "priority/p2", "size/xl", "area/mobile"]
+  body: |
+    Tracking issue for milestone **v0.6 — Android**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Tauri 2 Android build green in CI
+    - [ ] Touch-first UI: bottom sheets, swipe nav, large hit targets
+    - [ ] Mobile editor adapted from desktop (TipTap mobile gestures)
+    - [ ] Share-sheet integration (share-to-Lattice)
+    - [ ] Offline-first, syncs when online
+    - [ ] F-Droid + APK distribution; Play Store (post-stability)
+
+    ## Definition of done
+
+    - Lattice opens on an Android 10+ device, opens a vault from
+      shared storage, and survives a backgrounded → foregrounded cycle.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.7 — Engineering & ML superpowers"
+  milestone: "v0.7 — Engineering & ML superpowers"
+  labels: ["type/task", "priority/p2", "size/xl", "area/engineering-ml"]
+  body: |
+    Tracking issue for milestone **v0.7 — Engineering & ML superpowers**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Jupyter `.ipynb` import + render
+    - [ ] **Dataset** & **Model** typed objects with schema panels
+    - [ ] Experiment log template + W&B / MLflow optional fetcher
+    - [ ] DOI / arXiv lookup → auto paper note with metadata + BibTeX export
+    - [ ] "Connected Papers"-style citation graph
+    - [ ] Code-aware backlinks — link to symbol/line in a Git repo
+
+    ## Definition of done
+
+    - An ML researcher can drop in a paper PDF or arXiv URL and get a
+      structured note with bibliography, citations, and a citation-graph node.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.8 — Bookmarking"
+  milestone: "v0.8 — Bookmarking"
+  labels: ["type/task", "priority/p3", "size/xl", "area/bookmarking"]
+  body: |
+    Tracking issue for milestone **v0.8 — Bookmarking**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Browser extension (Chrome / Firefox / Edge)
+    - [ ] Readability extraction + offline archive
+    - [ ] YouTube / podcast clipper with transcript + timestamps
+    - [ ] AI tag suggestions, duplicate detection
+    - [ ] "Read later" queue + spaced-repetition resurface
+
+    ## Definition of done
+
+    - Clicking the extension in Chrome saves the current article as a
+      readable, offline-archived note in the vault in <2 s.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v0.9 — Power features"
+  milestone: "v0.9 — Power features"
+  labels: ["type/task", "priority/p3", "size/xl"]
+  body: |
+    Tracking issue for milestone **v0.9 — Power features**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Time-travel view (Git-style diff & blame per note)
+    - [ ] Live canvas (infinite, Excalidraw-derived, nodes back real notes)
+    - [ ] Workspace as data — DuckDB-on-SQLite, SQL queries over notes
+    - [ ] Plugin SDK (WASM-sandboxed) + plugin marketplace stub
+    - [ ] Theme marketplace + community themes
+
+    ## Definition of done
+
+    - At least one community-authored plugin runs in the WASM sandbox
+      with capability-scoped FS access.
+    - At least one user-authored DuckDB query executes against the vault.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
+
+- title: "Epic: v1.0 — Public Beta"
+  milestone: "v1.0 — Public Beta"
+  labels: ["type/task", "priority/p1", "size/xl"]
+  body: |
+    Tracking issue for milestone **v1.0 — Public Beta**.
+
+    ## Scope (from ROADMAP)
+
+    - [ ] Performance budget enforced (cold start <400 ms, search <30 ms p99)
+    - [ ] Accessibility audit (WCAG 2.2 AA)
+    - [ ] i18n scaffolding + first 3 locales
+    - [ ] Signed installers + auto-update on Windows / Linux
+    - [ ] Public beta launch, Hacker News post, docs site live
+
+    ## Definition of done
+
+    - Signed installers downloadable from `lattice.example.org` (or
+      equivalent) for Windows and Linux.
+    - Public docs site live; HN launch post scheduled; first 3 locales
+      shipping >90% string coverage.
+
+    ## Child issues
+
+    <!-- AUTO:CHILDREN -->
