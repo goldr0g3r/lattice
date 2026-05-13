@@ -45,6 +45,9 @@ async function main() {
   for (const label of desired) {
     const current = existingByName.get(label.name);
     if (!current) {
+      // `--force` makes this idempotent if the label was created by another
+      // workflow (e.g., actions/labeler racing with us) between our
+      // `label list` call and now. Without it, `gh label create` errors out.
       await ghRaw([
         "label",
         "create",
@@ -53,6 +56,7 @@ async function main() {
         label.color,
         "--description",
         label.description ?? "",
+        "--force",
       ]);
       log("  + create", label.name);
       created++;
