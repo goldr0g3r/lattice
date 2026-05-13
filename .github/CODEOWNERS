@@ -1,0 +1,19 @@
+# Default owner for everything in the repo unless overridden below.
+*                                @goldr0g3r
+
+# Rust core
+/core/                           @goldr0g3r
+
+# Frontend
+/apps/desktop/                   @goldr0g3r
+/apps/mobile/                    @goldr0g3r
+/packages/ui/                    @goldr0g3r
+/packages/editor/                @goldr0g3r
+
+# Infrastructure
+/.github/                        @goldr0g3r
+/server/                         @goldr0g3r
+
+# Docs (lighter review)
+/docs/                           @goldr0g3r
+*.md                             @goldr0g3r

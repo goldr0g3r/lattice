@@ -1,0 +1,70 @@
+name: 🐛 Bug report
+description: Something is broken or behaves unexpectedly.
+title: "bug: <short description>"
+labels: ["type/bug", "status/needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form
+        below so we can reproduce and fix the issue quickly.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+      placeholder: When I click X, Y happens instead of Z.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: How can a maintainer reproduce this?
+      placeholder: |
+        1. Open Lattice
+        2. Create a new note
+        3. ...
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - Android
+        - macOS (community build)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Lattice version
+      description: Help → About, or the commit SHA if building from source.
+      placeholder: v0.1.0 or abcdef0
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Paste relevant logs (use ``` fences) or drag in screenshots.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmations
+      options:
+        - label: I've searched existing issues and this isn't a duplicate.
+          required: true
+        - label: I'm not reporting a security vulnerability (those go in private advisories).
+          required: true

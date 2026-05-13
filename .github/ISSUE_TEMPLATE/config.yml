@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussion / Question
+    url: https://github.com/goldr0g3r/lattice/discussions
+    about: Ask questions, share ideas, and chat with the community.
+  - name: 🔒 Security vulnerability
+    url: https://github.com/goldr0g3r/lattice/security/advisories/new
+    about: Report a security issue privately. Do NOT use public issues for this.
