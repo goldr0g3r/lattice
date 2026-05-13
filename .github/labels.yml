@@ -1,0 +1,195 @@
+# Lattice — label taxonomy (source of truth).
+#
+# Run `.github/scripts/sync-labels.mjs` (or push to `main` and let
+# `label-sync.yml` do it) to mirror this file into the GitHub repo.
+#
+# Conventions:
+#   - Namespaced labels use `/` (e.g. `area/editor`).
+#   - Colors are 6-char hex strings without `#`.
+#   - Keep descriptions short (<100 chars) — they show up on hover.
+#
+# When you add a new label, also update CONTRIBUTING.md if it's user-facing.
+
+# ============================================================================
+# type/* — what kind of work is this?
+# ============================================================================
+
+- name: "type/bug"
+  color: "d73a4a"
+  description: "Something isn't working as designed"
+
+- name: "type/feature"
+  color: "0e8a16"
+  description: "A new capability or user-visible feature"
+
+- name: "type/task"
+  color: "5319e7"
+  description: "Internal work / chore that has a clear deliverable"
+
+- name: "type/docs"
+  color: "0075ca"
+  description: "Documentation, ADRs, vision, research, examples"
+
+- name: "type/refactor"
+  color: "fbca04"
+  description: "Code change with no user-visible behavior change"
+
+- name: "type/chore"
+  color: "ededed"
+  description: "Build, CI, deps, repo hygiene"
+
+# ============================================================================
+# area/* — which part of the system?
+# ============================================================================
+
+- name: "area/editor"
+  color: "5DB8A8"
+  description: "TipTap, CodeMirror, Markdown editor"
+
+- name: "area/search"
+  color: "1d76db"
+  description: "Tantivy index, query parsing, ranking"
+
+- name: "area/graph"
+  color: "5319e7"
+  description: "Cytoscape graph view, backlinks, link index"
+
+- name: "area/ai"
+  color: "a4bd52"
+  description: "AI providers, embeddings, RAG, prompts"
+
+- name: "area/sync"
+  color: "0075ca"
+  description: "Yjs/yrs CRDT, sync server, E2EE"
+
+- name: "area/mobile"
+  color: "c5def5"
+  description: "Tauri 2 Android, touch UI"
+
+- name: "area/ui"
+  color: "f9d0c4"
+  description: "shadcn primitives, layouts, theme"
+
+- name: "area/ux"
+  color: "fbca04"
+  description: "Interaction design, flows, accessibility"
+
+- name: "area/ci"
+  color: "6f42c1"
+  description: "GitHub Actions, workflows, release, lint"
+
+- name: "area/docs"
+  color: "0e8a16"
+  description: "README, ROADMAP, ADRs, contributor docs"
+
+- name: "area/core"
+  color: "b60205"
+  description: "lattice-core (Rust): vault, FS, index, errors"
+
+- name: "area/sdk"
+  color: "8b95a2"
+  description: "Plugin SDK, WASM runtime, IPC contract"
+
+- name: "area/bookmarking"
+  color: "e85a3c"
+  description: "Web clipper extension, read-later, archive"
+
+- name: "area/engineering-ml"
+  color: "1c232c"
+  description: "ipynb, Datasets, Models, Experiments, citations"
+
+# ============================================================================
+# priority/* — how urgent is it?
+# ============================================================================
+
+- name: "priority/p0"
+  color: "b60205"
+  description: "Drop everything — blocks a release or breaks users"
+
+- name: "priority/p1"
+  color: "e85a3c"
+  description: "High priority — needed for the next milestone"
+
+- name: "priority/p2"
+  color: "fbca04"
+  description: "Medium priority — should land within 1-2 milestones"
+
+- name: "priority/p3"
+  color: "c2e0c6"
+  description: "Low priority — nice to have / whenever"
+
+# ============================================================================
+# status/* — where is this in the workflow?
+# ============================================================================
+
+- name: "status/needs-triage"
+  color: "ededed"
+  description: "Awaiting first review from a maintainer"
+
+- name: "status/ready"
+  color: "0e8a16"
+  description: "Triaged, scoped, ready for an owner to pick up"
+
+- name: "status/in-progress"
+  color: "1d76db"
+  description: "Someone is actively working on this"
+
+- name: "status/blocked"
+  color: "d93f0b"
+  description: "Cannot progress until something else lands"
+
+- name: "status/needs-design"
+  color: "f9d0c4"
+  description: "Needs UX / API design before implementation can start"
+
+# ============================================================================
+# size/* — rough effort estimate (T-shirt sizes)
+# ============================================================================
+
+- name: "size/xs"
+  color: "c2e0c6"
+  description: "<1h — a tweak or a typo"
+
+- name: "size/s"
+  color: "bfd4f2"
+  description: "1-4h — a small contained change"
+
+- name: "size/m"
+  color: "fef2c0"
+  description: "0.5-2 days — a normal-sized change"
+
+- name: "size/l"
+  color: "fbca04"
+  description: "2-5 days — significant work, multiple files"
+
+- name: "size/xl"
+  color: "e85a3c"
+  description: ">5 days — split into smaller issues if possible"
+
+# ============================================================================
+# free-floating — special-purpose labels
+# ============================================================================
+
+- name: "good first issue"
+  color: "7057ff"
+  description: "Good for newcomers — small scope, clear acceptance"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Maintainer hands are full — community help welcome"
+
+- name: "discussion"
+  color: "d4c5f9"
+  description: "Open-ended conversation, no immediate action needed"
+
+- name: "breaking-change"
+  color: "b60205"
+  description: "Changes a public API or user-visible behavior"
+
+- name: "dependencies"
+  color: "0366d6"
+  description: "Dependabot / Renovate / dependency bump"
+
+- name: "security"
+  color: "ee0701"
+  description: "Security-sensitive — handle per SECURITY.md"
