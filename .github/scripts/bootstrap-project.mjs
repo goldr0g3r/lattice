@@ -18,27 +18,13 @@ const STATE_PATH = join(__dirname, ".project-state.json");
 
 const PROJECT_TITLE = "Lattice — Roadmap";
 
+// GitHub auto-creates `Status` and `Milestone` fields on every Project v2
+// (Status is a SingleSelect with Todo/In Progress/Done; Milestone is a
+// special Milestone-type field that auto-syncs with repo milestones set
+// on the issue). We don't try to override them — the auto fields are
+// good enough, and re-creating them errors with "Name has already been
+// taken". We only add the four custom SingleSelects below.
 const FIELDS = [
-  {
-    name: "Status",
-    options: ["Backlog", "Ready", "In progress", "In review", "Done"],
-  },
-  {
-    name: "Milestone",
-    options: [
-      "v0.1",
-      "v0.2",
-      "v0.3",
-      "v0.4",
-      "v0.5",
-      "v0.6",
-      "v0.7",
-      "v0.8",
-      "v0.9",
-      "v1.0",
-      "Beyond",
-    ],
-  },
   {
     name: "Area",
     options: [

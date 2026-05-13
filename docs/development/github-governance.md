@@ -119,6 +119,23 @@ not a source of truth — re-running the bootstrap from a fresh clone
 re-creates it. `bootstrap-issues.mjs` reads it to know which Project
 to attach issues to and which option IDs to set on each item.
 
+## Custom Project v2 fields — what we create vs. what GitHub gives us
+
+GitHub auto-creates two fields on every new Project v2:
+
+- **Status** — SingleSelect with default options `Todo`, `In Progress`, `Done`.
+  Non-deletable.
+- **Milestone** — special field tied to the repo milestone of the linked
+  issue (auto-syncs).
+
+Our `bootstrap-project.mjs` does **not** try to override these (the
+GraphQL API rejects re-using a reserved name). Instead, we add three
+custom SingleSelects on top: **Area**, **Priority**, **Size**. The
+script reads these into `.project-state.json`, and `bootstrap-issues.mjs`
+sets values for those three fields based on the issue's labels. The
+Status / Milestone fields are managed by GitHub — the milestone you
+pass to `gh issue create --milestone` shows up automatically.
+
 ## Branch protection — when to apply
 
 `bootstrap-repo.mjs --apply-protection` requires the **exact** CI
