@@ -70,3 +70,6 @@ test-results/
 # Lattice working dirs (don't commit a vault into the repo)
 /sandbox-vault/
 /.lattice/
+
+# Cursor (local AI planning artifacts, agent transcripts, etc.)
+.cursor/
