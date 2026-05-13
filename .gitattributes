@@ -1,0 +1,57 @@
+# Force LF for everything text by default; let git binary-detect for the rest.
+# Matches `end_of_line = lf` in .editorconfig and keeps CI runners happy on Linux.
+*               text=auto eol=lf
+
+# Explicitly mark file types we know are text and want normalised on commit.
+*.md            text eol=lf
+*.markdown      text eol=lf
+*.txt           text eol=lf
+*.json          text eol=lf
+*.jsonc         text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.toml          text eol=lf
+*.html          text eol=lf
+*.css           text eol=lf
+*.scss          text eol=lf
+*.js            text eol=lf
+*.cjs           text eol=lf
+*.mjs           text eol=lf
+*.ts            text eol=lf
+*.tsx           text eol=lf
+*.jsx           text eol=lf
+*.rs            text eol=lf
+*.sh            text eol=lf
+*.editorconfig  text eol=lf
+
+# Windows-only files keep CRLF.
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=crlf
+
+# Binaries — leave alone.
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.webp          binary
+*.ico           binary
+*.icns          binary
+*.pdf           binary
+*.zip           binary
+*.gz            binary
+*.tgz           binary
+*.7z            binary
+*.exe           binary
+*.dll           binary
+*.so            binary
+*.dylib         binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.otf           binary
+
+# Lockfiles — keep on their author's terms.
+pnpm-lock.yaml  text eol=lf -diff
+package-lock.json text eol=lf -diff
+Cargo.lock      text eol=lf -diff
