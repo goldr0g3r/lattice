@@ -1,0 +1,59 @@
+name: commitlint
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  pr-title:
+    name: commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title against Conventional Commits
+        # We squash-merge — the PR title becomes the canonical commit on main.
+        # Keep the `types` and `scopes` lists in sync with commitlint.config.cjs.
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          scopes: |
+            repo
+            editor
+            search
+            graph
+            ai
+            sync
+            mobile
+            ui
+            ux
+            ci
+            docs
+            core
+            sdk
+            bookmarking
+            engineering-ml
+            desktop
+            android
+            release
+            deps
+            adr
+            github
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject ("${subject}") must start with a lowercase character.

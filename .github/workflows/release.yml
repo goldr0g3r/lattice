@@ -1,0 +1,33 @@
+name: release
+
+# Placeholder for the v0.1 release workflow.
+#
+# When v0.1 is ready we'll:
+#   - Trigger on tag push (e.g. `v0.1.0`).
+#   - Build Tauri 2 bundles for Windows + Linux (and later Android).
+#   - Sign installers with the Tauri updater key.
+#   - Upload artifacts and create a GitHub Release.
+#   - Update the auto-update manifest.
+#
+# Until then, this exists so the file is reserved and so contributors know
+# release tooling is intentional, not forgotten.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  placeholder:
+    name: release placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo intent
+        run: |
+          echo "release.yml is a placeholder. Implementation lands with v0.1."
+          echo "Requested tag: ${{ github.event.inputs.tag }}"

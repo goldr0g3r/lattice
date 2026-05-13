@@ -22,7 +22,7 @@ We follow a trimmed [MADR](https://adr.github.io/madr/) format — see
 
 ## Lifecycle
 
-```
+```text
 Proposed  -->  Accepted  -->  Deprecated
                      \--->  Superseded by ADR-XXXX
 ```

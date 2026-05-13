@@ -1,0 +1,43 @@
+{
+  // markdownlint configuration — see https://github.com/DavidAnson/markdownlint
+  // for rule reference. We start permissive; tighten as the docs stabilise.
+  "config": {
+    "default": true,
+    "MD013": false, // line length — we let prose breathe
+    "MD022": false, // blanks around headings — the README's marketing sections pack tightly on purpose
+    "MD024": {
+      // duplicate headings — fine when nested under different parents
+      // (e.g. multiple "Pros" / "Cons" under different "Option" subheaders in ADRs)
+      "siblings_only": true
+    },
+    "MD032": false, // blanks around lists — same rationale as MD022
+    "MD033": false, // inline HTML — used for HTML comments + occasional <kbd>/<sub>
+    "MD041": false, // first line must be H1 — front-matter and section docs break this
+    "MD036": false, // emphasis-as-heading — used in ADR "Status:" bullets
+    "MD034": false, // bare URLs — we use them in citations
+    "MD040": true, // fenced code blocks must specify a language
+    "MD046": {
+      "style": "fenced"
+    },
+    "MD007": {
+      // unordered list indent
+      "indent": 2
+    },
+    "MD025": {
+      // single H1 per file
+      "level": 1,
+      "front_matter_title": ""
+    },
+    "MD060": false // table column style is too pedantic for hand-typed tables
+  },
+  "globs": ["**/*.md"],
+  "ignores": [
+    "**/node_modules/**",
+    "**/target/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    ".cursor/**",
+    "CHANGELOG.md"
+  ]
+}

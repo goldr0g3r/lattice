@@ -1,0 +1,34 @@
+# yamllint configuration for Lattice
+# https://yamllint.readthedocs.io/
+
+extends: default
+
+rules:
+  # We let YAML lines breathe — descriptions and bodies are sometimes long.
+  line-length:
+    max: 200
+    level: warning
+
+  # Comments don't need to start with a space (e.g., `#shebang`-style markers).
+  comments:
+    min-spaces-from-content: 1
+
+  comments-indentation: disable
+
+  # GitHub Actions uses `on:` which YAML 1.1 parses as boolean `true`.
+  # Disable truthy on top-level keys.
+  truthy:
+    check-keys: false
+
+  # Allow longer document-start omission (no `---` required at top).
+  document-start: disable
+
+  # `--` in front of bullet markers is fine.
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+  # Don't require trailing newlines to be exactly one (some tools add two).
+  empty-lines:
+    max: 2
+    max-end: 1

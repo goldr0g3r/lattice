@@ -112,7 +112,7 @@ Google Fonts call). A `--font-fallback-serif` / `--font-fallback-sans`
 
 - **Three font families** add ~250 KB to the bundle (subset, woff2).
   Acceptable on desktop; on Android we'll consider a `display: swap`
-  + subset-only-Latin variant.
+  variant subset to Latin only.
 - **Newsreader / Inter / JetBrains Mono** are all variable fonts — old
   Linux WebKitGTK ( ≤ 2.36 ) may render fallback weights. Mitigation:
   fallback chain.

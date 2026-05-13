@@ -1,0 +1,48 @@
+name: label-sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/labels.yml"
+      - ".github/scripts/sync-labels.mjs"
+      - ".github/scripts/lib/**"
+      - ".github/scripts/package.json"
+  workflow_dispatch:
+    inputs:
+      prune:
+        description: "Also delete labels not present in labels.yml"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    name: sync labels.yml → GitHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install script deps
+        working-directory: .github/scripts
+        run: npm install --omit=dev --no-audit --no-fund
+
+      - name: Sync labels
+        working-directory: .github/scripts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.prune }}" = "true" ]; then
+            node sync-labels.mjs --prune
+          else
+            node sync-labels.mjs
+          fi

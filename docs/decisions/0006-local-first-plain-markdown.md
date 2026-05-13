@@ -73,9 +73,9 @@ truth** for everything except optional CRDT sync state.
 - **No native real-time multiplayer on disk.** Yjs solves it for the
   editor view, but two clients editing the same file at the same
   millisecond on a shared filesystem will race. Mitigation: file watcher
-  + last-writer-wins on disk + CRDT for cross-device, plus a "vault
-  conflict" UI for the pathological case (Obsidian Sync handles this
-  the same way).
+  combined with last-writer-wins on disk and a CRDT for cross-device,
+  plus a "vault conflict" UI for the pathological case (Obsidian Sync
+  handles this the same way).
 - **Index is a separate layer.** Tantivy + SQLite must stay consistent
   with disk; if they drift, search results lie. Mitigation: file
   watcher + integrity check on startup; the user can always

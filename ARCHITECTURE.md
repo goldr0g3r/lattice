@@ -4,7 +4,7 @@
 
 ## High-level
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                       Frontend (UI)                          │
 │   React 18 + TS + Vite + Tailwind + shadcn/ui                │
@@ -25,7 +25,7 @@
 
 ## Repo layout (target)
 
-```
+```text
 lattice/
 ├─ apps/
 │  ├─ desktop/          # Tauri 2 desktop shell (Windows, Linux)
@@ -58,7 +58,7 @@ lattice/
 
 **Source of truth: the user's filesystem.**
 
-```
+```text
 ~/MyVault/
 ├─ .lattice/                  # private to the app
 │  ├─ index.db                # SQLite (metadata, FTS via Tantivy on the side)
