@@ -80,7 +80,7 @@ CI top-level jobs are: `pnpm install --frozen-lockfile`, then
 ### Neutral
 
 - `package-lock.json` and `yarn.lock` are forbidden via `.gitignore`
-  + a CI check.
+  plus a CI check.
 - Node version pinned via `.nvmrc` (and `engines.node` in root
   `package.json`).
 - We won't adopt **pnpm catalogs** in v0.1 (they're stable but new);
@@ -100,9 +100,8 @@ CI top-level jobs are: `pnpm install --frozen-lockfile`, then
 
 ### Option B — Nx
 
-- **Pros**: end-to-end opinionated runtime (one tool for orchestration
-  + generators + linting + plugins), strong cache, great editor
-  integration.
+- **Pros**: end-to-end opinionated runtime (one tool for orchestration,
+  generators, linting, plugins), strong cache, great editor integration.
 - **Cons**: heavy. The Nx runtime + plugins want to own a lot of the
   surface area; small repos pay the cognitive tax. Less common in the
   Tauri/Rust crowd.
