@@ -1,0 +1,86 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Wiki link variants"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "A bare link to "
+            }
+          },
+          {
+            "type": "wiki_link",
+            "data": {
+              "target": "Transformers",
+              "alias": null
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": " and an aliased link to "
+            }
+          },
+          {
+            "type": "wiki_link",
+            "data": {
+              "target": "Transformers",
+              "alias": "the paper"
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": "."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Plus another sentence with "
+            }
+          },
+          {
+            "type": "wiki_link",
+            "data": {
+              "target": "Distributed Systems",
+              "alias": null
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": " inline."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

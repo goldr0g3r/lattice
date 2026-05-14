@@ -1,0 +1,41 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Excalidraw embed"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "fenced",
+      "data": {
+        "info": "excalidraw",
+        "body": "attachments/abc-123/system-arch.png\n"
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "The renderer resolves the path to the editable JSON sidecar per ADR-0017."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Callouts"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "callout",
+      "data": {
+        "kind": "note",
+        "body": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "A plain note callout body."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "callout",
+      "data": {
+        "kind": "tip",
+        "body": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "A tip with "
+                  }
+                },
+                {
+                  "type": "strong",
+                  "data": {
+                    "content": [
+                      {
+                        "type": "text",
+                        "data": {
+                          "value": "strong"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "text",
+                  "data": {
+                    "value": " content."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "callout",
+      "data": {
+        "kind": "info",
+        "body": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "Multi-paragraph info."
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "Second paragraph still inside the callout."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "callout",
+      "data": {
+        "kind": "warning",
+        "body": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "Warning callout."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "callout",
+      "data": {
+        "kind": "caution",
+        "body": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "Caution callout."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

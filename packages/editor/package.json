@@ -1,0 +1,43 @@
+{
+  "name": "@lattice/editor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lattice editor package: Markdown parser + serializer mirror of core/lattice-core/src/markdown/ (v0.2 PR #1). TipTap editor lands in v0.2 PR #2.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./markdown": {
+      "types": "./src/markdown/index.ts",
+      "import": "./src/markdown/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@lattice/core-bindings": "workspace:*",
+    "mdast-util-from-markdown": "^2.0.2",
+    "mdast-util-frontmatter": "^2.0.1",
+    "mdast-util-gfm": "^3.0.0",
+    "mdast-util-math": "^3.0.0",
+    "micromark-extension-frontmatter": "^2.0.0",
+    "micromark-extension-gfm": "^3.0.0",
+    "micromark-extension-math": "^3.1.0",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@lattice/tsconfig-preset": "workspace:*",
+    "@types/mdast": "^4.0.4",
+    "typescript": "~5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

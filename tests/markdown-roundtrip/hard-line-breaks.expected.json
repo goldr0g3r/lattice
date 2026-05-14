@@ -1,0 +1,71 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Hard line breaks"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "A paragraph with a hard break"
+            }
+          },
+          {
+            "type": "line_break",
+            "data": {
+              "hard": true
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": "on the second line because of two trailing spaces."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Another paragraph with a soft break"
+            }
+          },
+          {
+            "type": "line_break",
+            "data": {
+              "hard": false
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": "that wraps naturally without two spaces."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

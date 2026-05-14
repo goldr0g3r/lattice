@@ -133,6 +133,28 @@ jobs:
           git diff --exit-code packages/core-bindings/src/generated/ \
             || (echo "::error::ts-rs bindings drifted — run 'cargo test -p lattice-core' locally and commit the diff" && exit 1)
 
+      - name: Verify markdown round-trip AST snapshots
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Regenerate every fixture's <name>.expected.json via dump_ast and
+          # diff against the committed copy. The cargo test above also checks
+          # this in-process; this step exists so drift surfaces as its own
+          # CI signal with a clear regeneration command.
+          set -euo pipefail
+          for md in tests/markdown-roundtrip/*.md; do
+            name="$(basename "$md")"
+            if [[ "$name" == "README.md" ]]; then continue; fi
+            expected="${md%.md}.expected.json"
+            cargo run --quiet --example dump_ast -- "$md" > "$expected.actual"
+            diff -u "$expected" "$expected.actual" || {
+              echo "::error file=$expected::markdown AST drift — regenerate with: cargo run --example dump_ast -- $md > $expected"
+              rm -f "$expected.actual"
+              exit 1
+            }
+            rm -f "$expected.actual"
+          done
+
   desktop-build:
     name: desktop-build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

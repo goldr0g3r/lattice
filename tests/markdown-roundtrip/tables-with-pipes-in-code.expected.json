@@ -1,0 +1,117 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Tables"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "data": {
+        "header": {
+          "cells": [
+            [
+              {
+                "type": "text",
+                "data": {
+                  "value": "Left"
+                }
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "data": {
+                  "value": "Center"
+                }
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "data": {
+                  "value": "Right"
+                }
+              }
+            ]
+          ]
+        },
+        "rows": [
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "one"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "two"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "3"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "four"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "five"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "6"
+                  }
+                }
+              ]
+            ]
+          }
+        ],
+        "alignments": [
+          "left",
+          "center",
+          "right"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "frontmatter": {
+    "entries": [
+      {
+        "key": "title",
+        "value": "Welcome"
+      },
+      {
+        "key": "tags",
+        "value": [
+          "aiml",
+          "distributed-systems"
+        ]
+      },
+      {
+        "key": "created",
+        "value": "2026-05-14"
+      },
+      {
+        "key": "draft",
+        "value": false
+      }
+    ]
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Body starts here"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "A paragraph after the frontmatter."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

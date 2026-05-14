@@ -1,0 +1,317 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Nested lists"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bullet_list",
+      "data": {
+        "items": [
+          {
+            "checked": null,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "First top-level bullet"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Second bullet"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "bullet_list",
+                "data": {
+                  "items": [
+                    {
+                      "checked": null,
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "data": {
+                            "content": [
+                              {
+                                "type": "text",
+                                "data": {
+                                  "value": "Nested under second"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "checked": null,
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "data": {
+                            "content": [
+                              {
+                                "type": "text",
+                                "data": {
+                                  "value": "Another nested"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "bullet_list",
+                          "data": {
+                            "items": [
+                              {
+                                "checked": null,
+                                "content": [
+                                  {
+                                    "type": "paragraph",
+                                    "data": {
+                                      "content": [
+                                        {
+                                          "type": "text",
+                                          "data": {
+                                            "value": "Three-level deep"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Third top-level bullet"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "ordered_list",
+      "data": {
+        "start": 1,
+        "items": [
+          {
+            "checked": null,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "First ordered"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Second ordered"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "ordered_list",
+                "data": {
+                  "start": 1,
+                  "items": [
+                    {
+                      "checked": null,
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "data": {
+                            "content": [
+                              {
+                                "type": "text",
+                                "data": {
+                                  "value": "Nested ordered"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "checked": null,
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "data": {
+                            "content": [
+                              {
+                                "type": "text",
+                                "data": {
+                                  "value": "Sibling nested"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Third ordered"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "bullet_list",
+      "data": {
+        "items": [
+          {
+            "checked": false,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Unchecked task"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "checked": true,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Checked task"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "checked": false,
+            "content": [
+              {
+                "type": "paragraph",
+                "data": {
+                  "content": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "value": "Another unchecked"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

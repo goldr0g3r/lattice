@@ -1,0 +1,91 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Heading one"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading",
+      "data": {
+        "level": 2,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Heading two"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading",
+      "data": {
+        "level": 3,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Heading three"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading",
+      "data": {
+        "level": 4,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Heading four"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading",
+      "data": {
+        "level": 5,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Heading five"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading",
+      "data": {
+        "level": 6,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Heading six"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

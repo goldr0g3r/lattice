@@ -9,6 +9,42 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 PR #1 — Markdown round-trip + golden corpus**
+  ([`feat/markdown-roundtrip`](https://github.com/goldr0g3r/lattice/pull/53),
+  issue [#35](https://github.com/goldr0g3r/lattice/issues/35)). Lands the
+  on-disk format contract for the v0.2 editor per
+  [ADR-0015](docs/decisions/0015-markdown-flavor-and-serialization.md):
+  - **Rust core** (`core/lattice-core/src/markdown/`): `NoteDoc` AST
+    (`doc.rs`, `Block` / `Inline` / `ListItem` / `Row` /
+    `Frontmatter{,Entry}` / `Alignment` / `CalloutKind` — all `ts-rs`-exported
+    to `packages/core-bindings/src/generated/`), `frontmatter.rs` (YAML head
+    with `serde_yaml_ng`, order preserved via `FrontmatterEntry` vector),
+    `parser.rs` (`pulldown-cmark` walker + post-walk passes for wiki-links,
+    inline math, callouts), `serializer.rs` (hand-rolled canonical-form
+    emitter — no third-party formatter, so we control whitespace
+    byte-for-byte). New deps: `pulldown-cmark`, `serde_yaml_ng`,
+    `pretty_assertions` (dev).
+  - **TypeScript mirror** (`packages/editor/`): new `@lattice/editor`
+    package re-exports `parse` / `serialize` over the same `NoteDoc` types
+    from `@lattice/core-bindings`. Built on `mdast-util-from-markdown` +
+    `mdast-util-gfm` / `-math` / `-frontmatter` and `yaml`; the serializer
+    is a hand-rolled mirror of the Rust emitter.
+  - **Golden corpus** (`tests/markdown-roundtrip/`): 13 fixture pairs
+    (`simple`, `headings`, `lists-nested`, `tables-with-pipes-in-code`,
+    `footnotes`, `frontmatter-edges`, `hard-line-breaks`, `wiki-links`,
+    `callouts`, `math-inline-block`, `mermaid-fence`, `excalidraw-fence`,
+    `html-snippet`) with committed `<name>.expected.json` snapshots emitted
+    by the new `dump_ast` example binary
+    (`core/lattice-core/examples/dump_ast.rs`).
+  - **Parity gates**: `core/lattice-core/tests/markdown_roundtrip.rs`
+    asserts `serialize(parse(x)) == x` byte-identical for every fixture and
+    that each committed `expected.json` still matches what the parser
+    emits; `packages/editor/src/markdown/__tests__/roundtrip.test.ts`
+    runs the same loop in Vitest against the same fixtures + JSON
+    snapshots, so TS and Rust must agree. CI gains a Linux-only step
+    in the `rust` job that regenerates every `expected.json` via
+    `dump_ast` and diffs against the committed copy so AST drift surfaces
+    as its own signal.
 - **v0.2 kick-off prep** — wrap-up sub-plan executed (see
   `~/.cursor/plans/v0.1-wrapup-v0.2-kickoff_82bcf2ad.plan.md`):
   v0.1 task issues `#21-#32` + epic `#11` closed with reconciliation comments;
