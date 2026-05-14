@@ -2,7 +2,7 @@
   "name": "@lattice/editor",
   "version": "0.1.0",
   "private": true,
-  "description": "Lattice editor package: Markdown parser + serializer mirror of core/lattice-core/src/markdown/ (v0.2 PR #1). TipTap editor lands in v0.2 PR #2.",
+  "description": "Lattice editor package: TipTap block editor + Markdown round-trip (v0.2 PR #1 + #2).",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "./src/index.ts",
@@ -15,7 +15,12 @@
     "./markdown": {
       "types": "./src/markdown/index.ts",
       "import": "./src/markdown/index.ts"
-    }
+    },
+    "./tiptap": {
+      "types": "./src/tiptap/index.ts",
+      "import": "./src/tiptap/index.ts"
+    },
+    "./Editor.css": "./src/tiptap/Editor.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings=0",
@@ -25,6 +30,21 @@
   },
   "dependencies": {
     "@lattice/core-bindings": "workspace:*",
+    "@tiptap/core": "^2.10.3",
+    "@tiptap/extension-code-block": "^2.10.3",
+    "@tiptap/extension-link": "^2.10.3",
+    "@tiptap/extension-placeholder": "^2.10.3",
+    "@tiptap/extension-table": "^2.10.3",
+    "@tiptap/extension-table-cell": "^2.10.3",
+    "@tiptap/extension-table-header": "^2.10.3",
+    "@tiptap/extension-table-row": "^2.10.3",
+    "@tiptap/extension-task-item": "^2.10.3",
+    "@tiptap/extension-task-list": "^2.10.3",
+    "@tiptap/pm": "^2.10.3",
+    "@tiptap/react": "^2.10.3",
+    "@tiptap/starter-kit": "^2.10.3",
+    "@tiptap/suggestion": "^2.10.3",
+    "lucide-react": "^0.469.0",
     "mdast-util-from-markdown": "^2.0.2",
     "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm": "^3.0.0",
@@ -32,11 +52,18 @@
     "micromark-extension-frontmatter": "^2.0.0",
     "micromark-extension-gfm": "^3.0.0",
     "micromark-extension-math": "^3.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tippy.js": "^6.3.7",
     "yaml": "^2.6.1"
   },
   "devDependencies": {
     "@lattice/tsconfig-preset": "workspace:*",
+    "@testing-library/react": "^16.1.0",
     "@types/mdast": "^4.0.4",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "jsdom": "^25.0.1",
     "typescript": "~5.7.2",
     "vitest": "^2.1.8"
   }

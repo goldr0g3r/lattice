@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 
-import type { LatticeError, VaultInfo } from "@lattice/core-bindings";
+import type { LatticeError, NoteDoc, VaultInfo } from "@lattice/core-bindings";
+import { Editor } from "@lattice/editor";
 import {
   Button,
   Card,
@@ -54,6 +55,65 @@ export function App() {
   const [pendingError, setPendingError] = useState<string | null>(null);
   const [coldStartMs, setColdStartMs] = useState<number | null>(null);
   const [coreVersion, setCoreVersion] = useState<string | null>(null);
+  const [draftDoc, setDraftDoc] = useState<NoteDoc | null>(null);
+
+  // v0.2 PR #2: in-memory demo doc so the TipTap editor has a surface to mount
+  // against while vault-file load/save is still pending. The follow-up PR
+  // (issue #34/#36/#37 and on) replaces this with real note IO.
+  const initialDoc = useMemo<NoteDoc>(
+    () => ({
+      frontmatter: { entries: [] },
+      body: [
+        {
+          type: "heading",
+          data: { level: 1, content: [{ type: "text", data: { value: "Welcome to Lattice" } }] },
+        },
+        {
+          type: "paragraph",
+          data: {
+            content: [
+              { type: "text", data: { value: "Type " } },
+              { type: "code", data: { value: "/" } },
+              {
+                type: "text",
+                data: {
+                  value:
+                    " for the slash menu. The editor round-trips through Markdown via the v0.2 PR #1 corpus.",
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: "callout",
+          data: {
+            kind: "info",
+            body: [
+              {
+                type: "paragraph",
+                data: {
+                  content: [
+                    {
+                      type: "text",
+                      data: {
+                        value:
+                          "Vault file IO lands in a follow-up PR. Edits here are in-memory only.",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    }),
+    [],
+  );
+
+  const handleEditorChange = useCallback((doc: NoteDoc) => {
+    setDraftDoc(doc);
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -112,6 +172,51 @@ export function App() {
     }
   }
 
+  if (vault) {
+    return (
+      <main className="flex min-h-screen flex-col gap-4 p-6">
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Wordmark className="text-2xl text-text-primary" />
+            <span className="font-mono text-xs text-text-secondary">{vault.root}</span>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleOpenVault}>
+              Switch vault…
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleCloseVault}>
+              Close
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+            >
+              {theme === "light" ? "Dark" : "Light"}
+            </Button>
+          </div>
+        </header>
+        <Separator />
+        <section className="mx-auto w-full max-w-3xl">
+          <Editor initialDoc={initialDoc} onChange={handleEditorChange} />
+        </section>
+        {pendingError && (
+          <p role="alert" className="text-sm text-accent-secondary">
+            {pendingError}
+          </p>
+        )}
+        {coreVersion && (
+          <footer className="text-xs text-text-secondary">
+            lattice-core {coreVersion}
+            {coldStartMs !== null && <> · cold start {coldStartMs} ms</>}
+            {draftDoc && <> · {draftDoc.body.length} blocks in draft</>}
+          </footer>
+        )}
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
       <div className="absolute right-4 top-4">
@@ -131,33 +236,17 @@ export function App() {
             <Wordmark className="text-5xl text-text-primary" />
           </CardTitle>
           <CardDescription>
-            Pre-alpha scaffolding. Editor lands in v0.2; file watcher + reactive index in PR #7.
+            Open a vault to start writing. The TipTap editor + slash menu mounts as soon as a vault
+            is loaded.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {vault ? (
-            <div className="flex flex-col gap-2">
-              <p className="text-sm text-text-secondary">Vault</p>
-              <p className="font-mono text-sm text-text-primary">{vault.root}</p>
-              <p className="text-xs text-text-secondary">
-                {vault.note_count} {vault.note_count === 1 ? "note" : "notes"} indexed
-              </p>
-              <Separator className="my-2" />
-              <div className="flex gap-3">
-                <Button onClick={handleOpenVault}>Switch vault…</Button>
-                <Button variant="outline" onClick={handleCloseVault}>
-                  Close
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex gap-3">
-              <Button onClick={handleOpenVault}>Open vault…</Button>
-              <Button variant="outline" disabled>
-                Settings
-              </Button>
-            </div>
-          )}
+          <div className="flex gap-3">
+            <Button onClick={handleOpenVault}>Open vault…</Button>
+            <Button variant="outline" disabled>
+              Settings
+            </Button>
+          </div>
           {pendingError && (
             <p role="alert" className="text-sm text-accent-secondary">
               {pendingError}

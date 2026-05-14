@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@lattice/core-bindings": "workspace:*",
+    "@lattice/editor": "workspace:*",
     "@lattice/ui": "workspace:*",
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/plugin-dialog": "^2.0.1",
