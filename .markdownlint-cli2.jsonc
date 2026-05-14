@@ -39,5 +39,10 @@
     "**/.git/**",
     ".cursor/**",
     "CHANGELOG.md",
+    // Markdown round-trip golden corpus (v0.2 PR #1, ADR-0015).
+    // Fixtures are byte-identical contract data that the parser/serializer
+    // round-trip; lint rules like MD028 (blank line in blockquote) conflict
+    // with the canonical multi-paragraph callout syntax we need to test.
+    "tests/markdown-roundtrip/**",
   ],
 }
