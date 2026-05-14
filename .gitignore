@@ -71,5 +71,4 @@ test-results/
 /sandbox-vault/
 /.lattice/
 
-# Cursor (local AI planning artifacts, agent transcripts, etc.)
-.cursor/
+
