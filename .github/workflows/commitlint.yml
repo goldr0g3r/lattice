@@ -15,7 +15,7 @@ jobs:
       - name: Validate PR title against Conventional Commits
         # We squash-merge — the PR title becomes the canonical commit on main.
         # Keep the `types` and `scopes` lists in sync with commitlint.config.cjs.
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
