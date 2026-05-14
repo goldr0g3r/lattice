@@ -41,3 +41,6 @@ docs/decisions/
 
 # Auto-generated bindings from ts-rs
 packages/core-bindings/src/generated/
+
+# Criterion bench baselines (tool-generated JSON snapshots)
+core/lattice-core/benches/baselines/
