@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "lattice-core"
 description = "Lattice core: vault FS, Markdown parser, SQLite index, file watcher, error model."
 version.workspace = true
@@ -33,12 +33,20 @@ notify = "7"
 notify-debouncer-full = "0.4"
 tracing-appender = "0.2"
 tracing-subscriber = { workspace = true }
+pulldown-cmark = { version = "0.12", default-features = false }
+serde_yaml_ng = "0.10"
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 insta = { version = "1.41", features = ["json"] }
 tempfile = "3.14"
 criterion = { version = "0.5", features = ["html_reports"] }
+pretty_assertions = "1.4"
+anyhow = { workspace = true }
+
+[[example]]
+name = "dump_ast"
+path = "examples/dump_ast.rs"
 
 [[bench]]
 name = "vault_open"

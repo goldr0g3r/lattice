@@ -1,0 +1,53 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Raw HTML"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "A paragraph followed by a details block."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "html_block",
+      "data": {
+        "html": "<details>\n<summary>Expand me</summary>\nHidden content.\n</details>"
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Another paragraph after the block."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Math"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Inline math like "
+            }
+          },
+          {
+            "type": "math",
+            "data": {
+              "display": false,
+              "src": "E = mc^2"
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": " inside a paragraph."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "math",
+      "data": {
+        "src": "\\int_0^1 x^2 \\, dx = \\frac{1}{3}"
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Another paragraph after the display math."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

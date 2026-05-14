@@ -1,0 +1,100 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Footnotes"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "A paragraph with a footnote reference"
+            }
+          },
+          {
+            "type": "footnote_ref",
+            "data": {
+              "id": "one"
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": " and another"
+            }
+          },
+          {
+            "type": "footnote_ref",
+            "data": {
+              "id": "two"
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": "."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "footnote_definition",
+      "data": {
+        "id": "one",
+        "content": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "First footnote definition."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "footnote_definition",
+      "data": {
+        "id": "two",
+        "content": [
+          {
+            "type": "paragraph",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "Second footnote definition."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

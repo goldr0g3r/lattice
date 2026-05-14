@@ -1,0 +1,118 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Hello, Lattice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "This is a paragraph with "
+            }
+          },
+          {
+            "type": "emphasis",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "emphasis"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": ", "
+            }
+          },
+          {
+            "type": "strong",
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "strong"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": ", and "
+            }
+          },
+          {
+            "type": "code",
+            "data": {
+              "value": "inline code"
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": "."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "A second paragraph follows with a "
+            }
+          },
+          {
+            "type": "link",
+            "data": {
+              "url": "https://example.org",
+              "title": null,
+              "content": [
+                {
+                  "type": "text",
+                  "data": {
+                    "value": "link"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "text",
+            "data": {
+              "value": " inside."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

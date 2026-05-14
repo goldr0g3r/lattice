@@ -44,3 +44,7 @@ packages/core-bindings/src/generated/
 
 # Criterion bench baselines (tool-generated JSON snapshots)
 core/lattice-core/benches/baselines/
+
+# Markdown round-trip golden corpus. Fixtures and their expected.json
+# snapshots are byte-identical contracts; Prettier must not touch them.
+tests/markdown-roundtrip/

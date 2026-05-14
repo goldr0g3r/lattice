@@ -1,0 +1,41 @@
+{
+  "frontmatter": {
+    "entries": []
+  },
+  "body": [
+    {
+      "type": "heading",
+      "data": {
+        "level": 1,
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Mermaid embed"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "fenced",
+      "data": {
+        "info": "mermaid",
+        "body": "flowchart LR\n  A --> B\n  B --> C\n"
+      }
+    },
+    {
+      "type": "paragraph",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "data": {
+              "value": "Paragraph after the diagram."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
