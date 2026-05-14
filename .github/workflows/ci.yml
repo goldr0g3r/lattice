@@ -46,45 +46,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect frontend
-        id: detect
-        shell: bash
-        run: |
-          if [ -f package.json ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No root package.json yet — skipping frontend checks."
-          fi
-
       - name: Set up pnpm
-        if: steps.detect.outputs.ready == 'true'
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
 
       - name: Set up Node
-        if: steps.detect.outputs.ready == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
       - name: Install dependencies
-        if: steps.detect.outputs.ready == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        if: steps.detect.outputs.ready == 'true'
         run: pnpm lint
 
       - name: Typecheck
-        if: steps.detect.outputs.ready == 'true'
         run: pnpm typecheck
 
       - name: Test
-        if: steps.detect.outputs.ready == 'true'
         run: pnpm test
+
+      - name: Format
+        run: pnpm format
+
+      - name: Token parity (ADR-0010 round-trip)
+        run: pnpm tokens:check
 
   rust:
     name: rust (${{ matrix.os }})
@@ -97,35 +86,78 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect Cargo workspace
-        id: detect
-        shell: bash
-        run: |
-          if [ -f Cargo.toml ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No root Cargo.toml yet — skipping rust checks."
-          fi
-
       - name: Set up Rust toolchain
-        if: steps.detect.outputs.ready == 'true'
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
 
       - name: Cache cargo
-        if: steps.detect.outputs.ready == 'true'
         uses: Swatinem/rust-cache@v2
 
       - name: cargo fmt
-        if: steps.detect.outputs.ready == 'true'
         run: cargo fmt --all --check
 
       - name: cargo clippy
-        if: steps.detect.outputs.ready == 'true'
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
       - name: cargo test
-        if: steps.detect.outputs.ready == 'true'
         run: cargo test --workspace --all-features
+
+      - name: Verify generated ts-rs bindings are committed
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # `cargo test` above re-emits the ts-rs bindings; CI fails if the
+          # committed copy in packages/core-bindings/src/generated/ drifted.
+          git diff --exit-code packages/core-bindings/src/generated/ \
+            || (echo "::error::ts-rs bindings drifted — run 'cargo test -p lattice-core' locally and commit the diff" && exit 1)
+
+  desktop-build:
+    name: desktop-build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: [frontend, rust]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux Tauri prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build desktop shell (debug)
+        run: pnpm --filter @lattice/desktop tauri build --debug --no-bundle

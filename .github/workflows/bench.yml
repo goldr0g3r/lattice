@@ -1,0 +1,81 @@
+name: bench
+
+# v0.1 PR #10 — perf budget harness.
+# Runs criterion benches against the Rust core. Initially advisory (no fail-on-regression
+# until baselines are committed under core/lattice-core/benches/baselines/main.json).
+# After the first post-merge `cargo bench -- --save-baseline main`, the gate becomes
+# load-bearing per the perf-budgets section of ARCHITECTURE.md.
+
+on:
+  pull_request:
+    paths:
+      - "core/**"
+      - "Cargo.toml"
+      - ".github/workflows/bench.yml"
+  push:
+    branches: [main]
+    paths:
+      - "core/**"
+      - "Cargo.toml"
+  workflow_dispatch:
+  schedule:
+    # Nightly full sweep with LATTICE_BENCH_LARGE=1
+    - cron: "0 6 * * *"
+
+concurrency:
+  group: bench-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    name: bench (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    # Allowed to fail until the regression-gating baselines are committed.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux Tauri/Webkit prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run criterion benches (PR-time sweep)
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        run: |
+          cargo bench --bench vault_open -- --warm-up-time 1
+          cargo bench --bench save_index -- --warm-up-time 1
+          cargo bench --bench watcher_latency -- --warm-up-time 1
+
+      - name: Run criterion benches (nightly full sweep with 10k tier)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          LATTICE_BENCH_LARGE: "1"
+        run: |
+          cargo bench --bench vault_open -- --warm-up-time 1
+          cargo bench --bench save_index -- --warm-up-time 1
+          cargo bench --bench watcher_latency -- --warm-up-time 1
+
+      - name: Upload criterion report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: criterion-report-${{ matrix.os }}
+          path: target/criterion/
+          retention-days: 14
+          if-no-files-found: ignore

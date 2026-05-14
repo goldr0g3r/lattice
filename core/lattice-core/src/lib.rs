@@ -14,12 +14,20 @@
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
 
+pub mod config;
 pub mod db;
 pub mod error;
+pub mod logging;
+pub mod telemetry;
 pub mod types;
+pub mod vault;
+pub mod watcher;
 
 pub use error::{LatticeError, LatticeResult};
-pub use types::{Attachment, Link, LinkKind, Note, Tag};
+pub use telemetry::{TelemetryClient, TelemetrySettings};
+pub use types::{Attachment, Link, LinkKind, Note, Tag, VaultInfo};
+pub use vault::Vault;
+pub use watcher::{default_debounce_ms, IndexEvent, IndexEventKind, Watcher};
 
 /// Current crate version, exposed for diagnostics.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

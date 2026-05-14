@@ -29,8 +29,25 @@ sqlx = { version = "0.8", default-features = false, features = [
 ] }
 ts-rs = { version = "10", features = ["chrono-impl", "uuid-impl"] }
 dirs = "5.0"
+notify = "7"
+notify-debouncer-full = "0.4"
+tracing-appender = "0.2"
+tracing-subscriber = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 insta = { version = "1.41", features = ["json"] }
 tempfile = "3.14"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "vault_open"
+harness = false
+
+[[bench]]
+name = "save_index"
+harness = false
+
+[[bench]]
+name = "watcher_latency"
+harness = false

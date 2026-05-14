@@ -1,0 +1,2 @@
+# Criterion baseline JSON files land here once `cargo bench --save-baseline main`
+# has been run against post-merge trunk. See ../README.md.

@@ -83,3 +83,16 @@ pub struct Attachment {
     /// MIME type (e.g. `image/png`), best-effort.
     pub mime: Option<String>,
 }
+
+/// Public snapshot of a vault — what the desktop shell shows in the title
+/// bar and "Switch vault…" menu.
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "../../../packages/core-bindings/src/generated/")]
+pub struct VaultInfo {
+    /// Absolute vault root.
+    pub root: String,
+    /// Total note count from the metadata index. Capped at `Number.MAX_SAFE_INTEGER`
+    /// on the TS side; realistic vault sizes are tens of thousands of notes.
+    #[ts(type = "number")]
+    pub note_count: i64,
+}

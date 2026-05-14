@@ -9,6 +9,111 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.1 hand-off → v0.2** — `.github/issues/v0.3-tasks.yml` pre-cut and
+  pushed to the live tracker (issues #40–#47 under
+  [Epic v0.3](.github/issues/epics.yml)) so v0.2 contributors can see the
+  road ahead. `bootstrap-issues.mjs` updated to include the new YAML.
+- **v0.1 PR #11** — CI baseline tightened: dropped the conditional
+  `Detect frontend` / `Detect Cargo workspace` guards in
+  [.github/workflows/ci.yml](.github/workflows/ci.yml) (the monorepo now
+  always exists, so a missing config is a hard error). Updated
+  `.github/scripts/bootstrap-repo.mjs` to add the full required-check list
+  to branch protection on `main`: `ci / meta`, `ci / frontend (ubuntu-latest)`,
+  `ci / frontend (windows-latest)`, `ci / rust (ubuntu-latest)`,
+  `ci / rust (windows-latest)`, `ci / desktop-build (ubuntu-latest)`,
+  `ci / desktop-build (windows-latest)`, and `commitlint`. Branch protection
+  re-applied via `bootstrap-repo.mjs --apply-protection`.
+- **v0.1 PR #10** — Criterion bench harness for the v0.1 perf budgets:
+  three benches under `core/lattice-core/benches/` —
+  `vault_open` (100 / 1 000 / opt-in 10 000-note tiers via
+  `LATTICE_BENCH_LARGE=1`), `save_index` (~94 µs per row vs the 50 ms
+  p99 budget), `watcher_latency` (50 ms debounce floor) — plus
+  `benches/README.md` documenting baseline workflow and the new
+  `.github/workflows/bench.yml` that runs the PR-time sweep on every
+  push/PR and the full sweep nightly. Bench gate is initially advisory
+  (`continue-on-error: true`); becomes load-bearing once
+  `target/criterion/.../baselines/main.json` is committed under
+  `core/lattice-core/benches/baselines/`.
+- **v0.1 ADR-0013** — Vault-conflict resolution UX: v0.1 = disk is
+  authoritative (silent re-read); v0.2 = three-option Dialog
+  ("Keep mine" / "Take theirs" / "Show diff & merge"); post-v0.5 CRDT
+  files get automatic merges.
+- **v0.1 PR #9** — Initial visual identity per
+  [ADR-0011](docs/decisions/0011-font-loading-strategy.md): Latin-subset
+  variable-weight `@fontsource-variable/{newsreader,inter,jetbrains-mono}`
+  loaded via `packages/ui/src/fonts.ts`, `Wordmark` React primitive that
+  renders the Lattice wordmark in Newsreader inheriting `currentColor`,
+  pre-React splash baked into [`apps/desktop/index.html`](apps/desktop/index.html)
+  (visible <800 ms before main paint, removed in `main.tsx` after mount),
+  raster fallback `wordmark.svg` + branded `icon-mark.svg` ("L" with two
+  lattice crossbars in `--accent-primary` on `--bg-canvas`) under
+  `packages/ui/src/assets/`. App shell now uses the `Wordmark` primitive
+  instead of plain text. Vite build adds ~270 KB of self-hosted woff2
+  files (Latin only).
+- **v0.1 ADR-0011** — Font-loading strategy: Latin-subset variable fonts
+  with `font-display: swap` and a system fallback chain; build-time
+  subsetting deferred to v1.0 perf hardening.
+- **v0.1 PR #8** — Structured logging + opt-in telemetry per
+  [ADR-0012](docs/decisions/0012-telemetry-event-schema-versioning.md):
+  `lattice_core::logging::init(vault_root)` configures a `tracing-subscriber`
+  with stderr layer + (when a vault is open) a daily-rotating
+  `tracing-appender` writer to `<vault>/.lattice/logs/lattice.log`. Reads
+  `LATTICE_LOG` or `RUST_LOG` for level. `lattice_core::TelemetryClient` ships
+  the on-disk half of the contract: events serialise to JSONL at
+  `<vault>/.lattice/logs/telemetry.jsonl` only when enabled (HTTP shipment is
+  a follow-up); `TelemetrySettings { enabled, endpoint }` persisted in
+  `UserConfig.telemetry`. Two new Tauri commands
+  (`telemetry_settings_get` / `telemetry_settings_set`) and a
+  `SettingsTelemetry` React surface with checkbox + endpoint input. Tauri
+  shell now calls `lattice_core::logging::init(None)` on boot. New
+  [docs/telemetry.md](docs/telemetry.md) documents the wire shape, privacy
+  stance, and v0.1 event registry.
+- **v0.1 ADR-0012** — Telemetry event schema and versioning: additive-only
+  fields, per-event `schema_minor`, no vault content shipped.
+- **v0.1 PR #7** — Reactive file watcher per
+  [ADR-0014](docs/decisions/0014-file-watcher-debounce.md):
+  `lattice_core::watcher::Watcher` wraps `notify-debouncer-full` with per-OS
+  debounce defaults (Linux 250 / Windows 100 / macOS 200 ms),
+  `lattice_core::IndexEvent` (kind: `created` / `modified` / `removed` /
+  `renamed` / `other`) ts-rs exported, three integration tests under
+  `core/lattice-core/tests/watcher_integration.rs` covering create / modify /
+  remove. Tauri shell extends `VaultState` with a `Watcher` slot; opening a
+  vault spawns a watcher that re-emits each event to the renderer as
+  `vault://index`; closing or switching the vault cleanly drops the watcher.
+- **v0.1 ADR-0014** — File-watcher debounce window: per-OS defaults,
+  overridable via the user setting `watcher.debounce_ms`.
+- **v0.1 PR #6** — `Vault` open / create / switch / close:
+  `lattice_core::Vault` owns the SQLite pool and the `.lattice/` subtree
+  (`attachments/`, `logs/`, `tantivy/`, `history/`), with `VaultInfo` snapshot
+  surfaced through ts-rs; `lattice_core::config::{read,write,set_last_vault,
+  clear_last_vault}` persists the last-opened-vault pointer at the
+  OS-appropriate config dir (refactored to `read_at`/`write_at` so tests
+  don't need to mutate process env). Tauri shell adds managed `VaultState`
+  and `vault_open` / `vault_create` / `vault_switch` / `vault_close` /
+  `vault_current` / `vault_last_opened` commands. `LatticeError` now derives
+  `ts_rs::TS` so the renderer can type-narrow on `kind`. App.tsx chains
+  folder picker → `vault_open`, auto-reopens the last vault on launch, and
+  renders the `VaultInfo` panel. Six integration tests under
+  `core/lattice-core/tests/vault_lifecycle.rs` cover happy path + the
+  failure modes called out in
+  [.github/issues/v0.1-tasks.yml](.github/issues/v0.1-tasks.yml).
+- **v0.1 PR #3** — Tauri 2 desktop shell per
+  [ADR-0001](docs/decisions/0001-tauri-2-cross-platform-shell.md):
+  `apps/desktop/src-tauri/` workspace member (`tauri.conf.json` with locked CSP +
+  centered 1280×800 window, `build.rs`, `capabilities/default.json`,
+  `main.rs` + `lib.rs::run()` with Tauri 2 `Emitter`/`Listener` traits,
+  `commands/vault.rs` (`open_vault_dialog` folder picker via
+  `tauri-plugin-dialog`), `commands/system.rs` (`core_version`,
+  `cold_start_ms` placeholder)), placeholder PNG + ICO icons under
+  `apps/desktop/src-tauri/icons/`, JS-side `@tauri-apps/api` +
+  `@tauri-apps/plugin-dialog` + `@tauri-apps/cli` deps, `App.tsx` rewired
+  to invoke `open_vault_dialog`, toggle `data-theme` persisted to
+  localStorage, emit `renderer://ready` on mount, and surface a cold-start
+  ms readout. New `desktop-build` CI matrix job (ubuntu-latest +
+  windows-latest) installs Linux Tauri prerequisites and runs
+  `pnpm --filter @lattice/desktop tauri build --debug --no-bundle`. Frontend
+  CI bumped to pnpm 10 and now also runs `pnpm format` + `pnpm tokens:check`;
+  rust CI fails if `packages/core-bindings/src/generated/` drifts.
 - **v0.1 PR #5** — Design-token round-trip + parity guard: `scripts/check-token-parity.mjs`
   parses `packages/ui/src/tokens.css` and `packages/config/tailwind-preset/index.cjs`,
   asserts every `var(--token)` reference resolves to a declared token (and vice versa),

@@ -61,3 +61,7 @@ ADRs are **never deleted or rewritten in place**. They're an append-only log.
 | 0008 | [pnpm + Turborepo monorepo](0008-pnpm-turborepo-monorepo.md)        | Accepted | 2026-05-13 |
 | 0009 | [Conventional Commits + squash-merge + trunk-based dev](0009-conventional-commits-trunk-based.md) | Accepted | 2026-05-13 |
 | 0010 | [Design tokens and typography](0010-design-tokens-and-typography.md) | Accepted | 2026-05-13 |
+| 0011 | [Font-loading strategy](0011-font-loading-strategy.md)              | Accepted | 2026-05-14 |
+| 0012 | [Telemetry event schema and versioning](0012-telemetry-event-schema-versioning.md) | Accepted | 2026-05-14 |
+| 0013 | [Vault-conflict resolution UX](0013-vault-conflict-resolution-ux.md) | Accepted | 2026-05-14 |
+| 0014 | [File-watcher debounce window](0014-file-watcher-debounce.md)       | Accepted | 2026-05-14 |

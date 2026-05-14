@@ -24,6 +24,7 @@ const EPICS_PATH = join(__dirname, "..", "issues", "epics.yml");
 const TASKS_PATHS = [
   join(__dirname, "..", "issues", "v0.1-tasks.yml"),
   join(__dirname, "..", "issues", "v0.2-tasks.yml"),
+  join(__dirname, "..", "issues", "v0.3-tasks.yml"),
 ];
 
 /**

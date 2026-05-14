@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lattice mark">
+  <title>Lattice mark</title>
+  <!-- "Tealda" accent  same teal as --accent-primary in tokens.css -->
+  <rect width="64" height="64" rx="14" fill="#5DB8A8" />
+  <!-- Stylised "L" with two lattice crossbars in the cream of --bg-canvas -->
+  <path d="M16 14 H24 V44 H46 V52 H16 Z" fill="#FAF6F0" />
+  <line x1="24" y1="24" x2="48" y2="24" stroke="#FAF6F0" stroke-width="3" stroke-linecap="round" />
+  <line x1="24" y1="34" x2="48" y2="34" stroke="#FAF6F0" stroke-width="3" stroke-linecap="round" />
+</svg>

@@ -19,6 +19,7 @@ export * from "./components/tabs";
 export * from "./components/tooltip";
 export * from "./components/toast";
 export * from "./components/command";
+export * from "./components/wordmark";
 export { cn } from "./lib/utils";
 
 export const UI_PACKAGE_VERSION = "0.1.0";

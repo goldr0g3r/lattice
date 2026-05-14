@@ -24,12 +24,12 @@ target/
 Cargo.lock.bak
 
 # Tauri
-src-tauri/target/
-src-tauri/gen/
-src-tauri/WixTools/
-apps/desktop/src-tauri/target/
-apps/mobile/src-tauri/target/
-apps/mobile/src-tauri/gen/
+**/src-tauri/target/
+**/src-tauri/gen/
+**/src-tauri/WixTools/
+
+# Cursor IDE
+.cursor/
 
 # Android
 *.apk

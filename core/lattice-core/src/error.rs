@@ -11,9 +11,15 @@ use std::io;
 
 use serde::Serialize;
 use thiserror::Error;
+use ts_rs::TS;
 
 /// Errors returned by the Lattice core.
-#[derive(Debug, Error, Serialize)]
+///
+/// The JSON shape (`{ kind: "...", details: { ... } }`) is locked by the
+/// snapshot tests under `core/lattice-core/tests/error_snapshot.rs` and by the
+/// ts-rs binding in `packages/core-bindings/src/generated/LatticeError.ts`.
+#[derive(Debug, Error, Serialize, TS)]
+#[ts(export, export_to = "../../../packages/core-bindings/src/generated/")]
 #[serde(tag = "kind", content = "details", rename_all = "snake_case")]
 pub enum LatticeError {
     /// Underlying I/O failure (file read/write, permission denied, etc.).

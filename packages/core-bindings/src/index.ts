@@ -12,5 +12,7 @@ export type { Tag } from "./generated/Tag";
 export type { Link } from "./generated/Link";
 export type { LinkKind } from "./generated/LinkKind";
 export type { Attachment } from "./generated/Attachment";
+export type { VaultInfo } from "./generated/VaultInfo";
+export type { LatticeError } from "./generated/LatticeError";
 
 export const CORE_BINDINGS_VERSION = "0.1.0";

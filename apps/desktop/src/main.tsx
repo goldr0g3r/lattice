@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
+import "@lattice/ui/fonts";
 import "./styles.css";
 import { App } from "./App";
 
@@ -14,3 +15,11 @@ ReactDOM.createRoot(root).render(
     <App />
   </React.StrictMode>,
 );
+
+// Hide the splash element baked into index.html as soon as React mounts.
+// Per ADR-0011 the swap is brief; per the v0.1 epic DoD the splash must
+// be gone by 800 ms after window paint.
+requestAnimationFrame(() => {
+  const splash = document.getElementById("lattice-splash");
+  if (splash) splash.remove();
+});

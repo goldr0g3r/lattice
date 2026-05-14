@@ -87,10 +87,24 @@ async function applyRepoSettings() {
 async function applyBranchProtection() {
   log("branch-protection", "applying to main");
 
+  // The list of contexts is the contract between CI and branch protection.
+  // Each entry must match a job's `name:` (or its templated value) exactly.
+  // Updated in v0.1 PR #11 once the monorepo scaffold landed.
+  const requiredContexts = [
+    "ci / meta",
+    "ci / frontend (ubuntu-latest)",
+    "ci / frontend (windows-latest)",
+    "ci / rust (ubuntu-latest)",
+    "ci / rust (windows-latest)",
+    "ci / desktop-build (ubuntu-latest)",
+    "ci / desktop-build (windows-latest)",
+    "commitlint",
+  ];
+
   const body = {
     required_status_checks: {
       strict: true,
-      contexts: ["ci / meta", "commitlint"],
+      contexts: requiredContexts,
     },
     enforce_admins: false,
     required_pull_request_reviews: {

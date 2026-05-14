@@ -5,8 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'" />
     <title>Lattice</title>
+    <style>
+      /*
+       * Splash baked into the HTML so something visible paints before the
+       * Tauri WebView even loads /src/main.tsx. Removed in main.tsx after
+       * React mounts (ADR-0011). Must be <800 ms before main paint per
+       * the v0.1 epic DoD.
+       */
+      :root {
+        color-scheme: light dark;
+        --splash-bg: #faf6f0;
+        --splash-fg: #1a1f26;
+        --splash-accent: #5db8a8;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --splash-bg: #0e1418;
+          --splash-fg: #f5f1ea;
+        }
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: var(--splash-bg);
+        color: var(--splash-fg);
+      }
+      #lattice-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        z-index: 9999;
+        background: var(--splash-bg);
+        font-family: "Newsreader", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+        font-size: 56px;
+        letter-spacing: -1px;
+      }
+      #lattice-splash::after {
+        content: "";
+        display: block;
+        width: 64px;
+        height: 2px;
+        background: var(--splash-accent);
+        opacity: 0.6;
+      }
+    </style>
   </head>
   <body class="bg-bg-canvas font-sans text-text-primary antialiased">
+    <div id="lattice-splash">Lattice</div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
