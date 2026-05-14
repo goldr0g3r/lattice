@@ -46,10 +46,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Note: `version` is intentionally omitted — pnpm/action-setup reads
+      # the `packageManager` field from package.json (pnpm@10.16.1).
+      # Setting both causes ERR_PNPM_BAD_PM_VERSION.
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -85,6 +86,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # The `lattice-desktop` workspace member pulls in tauri + tauri-plugin-dialog,
+      # whose `glib-sys` / `gobject-sys` build scripts need the GTK toolchain
+      # on Linux. Without these the `cargo clippy --workspace` step fails to
+      # link even though no Tauri code path runs. Same package list as
+      # `desktop-build` to keep them in sync.
+      - name: Install Linux Tauri prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
 
       - name: Set up Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -139,10 +160,9 @@ jobs:
             libayatana-appindicator3-dev \
             librsvg2-dev
 
+      # Version comes from package.json `packageManager`; see frontend job note.
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Set up Node
         uses: actions/setup-node@v4
