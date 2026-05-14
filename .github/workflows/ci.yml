@@ -50,7 +50,13 @@ jobs:
       # the `packageManager` field from package.json (pnpm@10.16.1).
       # Setting both causes ERR_PNPM_BAD_PM_VERSION.
       - name: Set up pnpm
+<<<<<<< HEAD
         uses: pnpm/action-setup@v4
+=======
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+>>>>>>> a6b9f24 (chore(deps): bump pnpm/action-setup from 4 to 6)
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -162,7 +168,13 @@ jobs:
 
       # Version comes from package.json `packageManager`; see frontend job note.
       - name: Set up pnpm
+<<<<<<< HEAD
         uses: pnpm/action-setup@v4
+=======
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+>>>>>>> a6b9f24 (chore(deps): bump pnpm/action-setup from 4 to 6)
 
       - name: Set up Node
         uses: actions/setup-node@v4
