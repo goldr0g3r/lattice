@@ -65,3 +65,6 @@ ADRs are **never deleted or rewritten in place**. They're an append-only log.
 | 0012 | [Telemetry event schema and versioning](0012-telemetry-event-schema-versioning.md) | Accepted | 2026-05-14 |
 | 0013 | [Vault-conflict resolution UX](0013-vault-conflict-resolution-ux.md) | Accepted | 2026-05-14 |
 | 0014 | [File-watcher debounce window](0014-file-watcher-debounce.md)       | Accepted | 2026-05-14 |
+| 0015 | [Markdown flavor and custom-node serialization](0015-markdown-flavor-and-serialization.md) | Accepted | 2026-05-14 |
+| 0016 | [Image and attachment storage](0016-attachment-storage.md)          | Accepted | 2026-05-14 |
+| 0017 | [Excalidraw embed storage format](0017-excalidraw-embed-storage.md) | Accepted | 2026-05-14 |
