@@ -1,0 +1,47 @@
+---
+description: GitHub operations in this repo use the gh CLI; never click around in the UI for things tracked in .github/. Follow the github-operations skill for canonical workflows.
+alwaysApply: true
+---
+
+# GitHub workflow (Lattice)
+
+## Use `gh`, not the web UI
+
+GitHub state in this repo is **config-as-code** under [`.github/`](.github/) — labels, milestones, epic + task issues, Project v2 fields, branch protection. UI clicks drift away on the next script run.
+
+For every GitHub operation, follow the [`github-operations`](~/.cursor/skills/github-operations/SKILL.md) skill. The canonical entry points:
+
+- **Labels** — edit `.github/labels.yml`, run `node .github/scripts/sync-labels.mjs`.
+- **Milestones** — edit `.github/milestones.yml`, run `node .github/scripts/sync-milestones.mjs`.
+- **Project v2 / issues** — edit `.github/issues/*.yml`, run `node .github/scripts/bootstrap-issues.mjs`.
+- **Repo settings + branch protection** — edit `.github/scripts/bootstrap-repo.mjs`, run with `--apply-protection`.
+
+See [`docs/development/github-governance.md`](docs/development/github-governance.md) for the full playbook.
+
+## Commit + branch conventions
+
+- Branch: `<type>/<short-slug>` — e.g. `feat/wiki-link-autocomplete`, `fix/graph-crash` ([CONTRIBUTING.md](CONTRIBUTING.md)).
+- Commits + PR titles: [Conventional Commits](https://www.conventionalcommits.org/) ([ADR-0009](docs/decisions/0009-conventional-commits-trunk-based.md)).
+- Merge strategy: **squash only**; PR title becomes the commit subject.
+
+## PR template
+
+Use a HEREDOC for the body — never paste multi-line markdown into a flag value:
+
+```bash
+gh pr create --draft --title "feat(area): one-line subject" --body "$(cat <<'EOF'
+## Summary
+- One bullet per behaviour change.
+
+## Test plan
+- [ ] What you ran locally.
+- [ ] What CI will verify.
+
+Closes #123
+EOF
+)"
+```
+
+## Branch protection is load-bearing
+
+`main` requires (re-applied in v0.1 PR #11): `ci / meta`, `ci / frontend (ubuntu-latest|windows-latest)`, `ci / rust (ubuntu-latest|windows-latest)`, `ci / desktop-build (ubuntu-latest|windows-latest)`, `commitlint`. **Never** `gh pr merge --admin` or `git push --force origin main`.

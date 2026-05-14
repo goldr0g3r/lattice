@@ -28,9 +28,6 @@ Cargo.lock.bak
 **/src-tauri/gen/
 **/src-tauri/WixTools/
 
-# Cursor IDE
-.cursor/
-
 # Android
 *.apk
 *.aab
