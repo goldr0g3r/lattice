@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 kick-off prep** — wrap-up sub-plan executed (see
+  `~/.cursor/plans/v0.1-wrapup-v0.2-kickoff_82bcf2ad.plan.md`):
+  v0.1 task issues `#21-#32` + epic `#11` closed with reconciliation comments;
+  initial criterion baselines committed under
+  [`core/lattice-core/benches/baselines/`](core/lattice-core/benches/baselines/)
+  (`vault_open` 100/1k notes, `save_index/single_note_insert`,
+  `watcher_latency/create_to_event_ms`); five queued dependabot PRs
+  (`#6`, `#7`, `#8`, `#9`, `#10`) rebased onto post-v0.1 main and merged;
+  CI workflow hotfix [PR #49](https://github.com/goldr0g3r/lattice/pull/49)
+  dropped the `pnpm/action-setup version: 10` override (conflicted with
+  `packageManager: pnpm@10.16.1`) and installed GTK/WebKit prereqs in the
+  `rust` Linux job (`cargo clippy --workspace` now drags
+  `lattice-desktop`'s glib chain). [`.prettierignore`](.prettierignore)
+  excludes the baselines folder so the format check stays green.
+- Workspace rule [`.cursor/rules/github-workflow.mdc`](.cursor/rules/github-workflow.mdc)
+  reinforces `gh` CLI + Conventional Commits + squash-merge for v0.2+.
+
+## [0.1.0] - 2026-05-14
+
+> Foundation release. Tagged from `main` commit `d51ad77` (perf baselines)
+> after the v0.1 scaffolding (`0538bff`, `d6fef68`) and the CI hotfix (`0c74662`).
+>
+> Implementation note: the 12 v0.1 PRs called out in the v0.1 sub-plan were
+> shipped as two squash commits (`0538bff` + `d6fef68`) pushed direct to
+> `main` rather than as 12 separate PRs. The 12 v0.1 task issues
+> (`#21-#32`) are closed with reconciliation comments linking back to the
+> shipping commit. v0.2 work returns to the documented one-PR-per-task
+> workflow per [`.cursor/rules/github-workflow.mdc`](.cursor/rules/github-workflow.mdc).
+
+### Added
+
 - **v0.1 hand-off → v0.2** — `.github/issues/v0.3-tasks.yml` pre-cut and
   pushed to the live tracker (issues #40–#47 under
   [Epic v0.3](.github/issues/epics.yml)) so v0.2 contributors can see the
