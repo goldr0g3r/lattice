@@ -1,0 +1,10 @@
+---
+source: core/lattice-core/tests/error_snapshot.rs
+expression: err
+---
+{
+  "kind": "not_found",
+  "details": {
+    "id": "note-123"
+  }
+}

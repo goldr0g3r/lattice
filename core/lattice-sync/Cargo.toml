@@ -1,0 +1,16 @@
+[package]
+name = "lattice-sync"
+description = "Lattice CRDT sync (yrs / Yjs) and E2EE wrapping for the optional sync server."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+thiserror = { workspace = true }
+tracing = { workspace = true }

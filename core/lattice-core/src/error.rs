@@ -1,0 +1,89 @@
+//! Lattice error type.
+//!
+//! `LatticeError` is the public error of the core. Each variant is serialisable
+//! so the desktop shell can surface it to the user via Tauri IPC and the
+//! frontend can render typed messages without parsing strings.
+//!
+//! The JSON shape is locked by a snapshot test (`tests/error_snapshot.rs`);
+//! any change to a variant's representation must update that snapshot.
+
+use std::io;
+
+use serde::Serialize;
+use thiserror::Error;
+
+/// Errors returned by the Lattice core.
+#[derive(Debug, Error, Serialize)]
+#[serde(tag = "kind", content = "details", rename_all = "snake_case")]
+pub enum LatticeError {
+    /// Underlying I/O failure (file read/write, permission denied, etc.).
+    #[error("io error: {message}")]
+    Io {
+        /// Human-readable description from the underlying [`io::Error`].
+        message: String,
+    },
+
+    /// Database access failure (sqlx error wrapped to be serialisable).
+    #[error("database error: {message}")]
+    Database {
+        /// Human-readable description from the underlying [`sqlx::Error`].
+        message: String,
+    },
+
+    /// Schema migration failure.
+    #[error("migration error: {message}")]
+    Migration {
+        /// Human-readable description from the underlying migration error.
+        message: String,
+    },
+
+    /// The provided path is not usable as a vault.
+    #[error("invalid path '{path}': {reason}")]
+    InvalidPath {
+        /// Path the user provided.
+        path: String,
+        /// Why it failed validation.
+        reason: String,
+    },
+
+    /// No entity with the supplied id was found.
+    #[error("not found: {id}")]
+    NotFound {
+        /// Identifier the caller looked up.
+        id: String,
+    },
+
+    /// The telemetry pipeline failed (non-fatal; logged and dropped).
+    #[error("telemetry error: {message}")]
+    Telemetry {
+        /// Human-readable description.
+        message: String,
+    },
+}
+
+impl From<io::Error> for LatticeError {
+    fn from(value: io::Error) -> Self {
+        LatticeError::Io {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<sqlx::Error> for LatticeError {
+    fn from(value: sqlx::Error) -> Self {
+        LatticeError::Database {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<sqlx::migrate::MigrateError> for LatticeError {
+    fn from(value: sqlx::migrate::MigrateError) -> Self {
+        LatticeError::Migration {
+            message: value.to_string(),
+        }
+    }
+}
+
+/// Convenience alias for `Result<T, LatticeError>`.
+pub type LatticeResult<T> = Result<T, LatticeError>;

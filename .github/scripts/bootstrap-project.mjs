@@ -70,9 +70,7 @@ async function findOrCreateProject(owner) {
   `;
   const data = await ghGraphQL(query, { login: owner.login });
   const projects =
-    owner.type === "User"
-      ? data.user.projectsV2.nodes
-      : data.organization.projectsV2.nodes;
+    owner.type === "User" ? data.user.projectsV2.nodes : data.organization.projectsV2.nodes;
   const existing = projects.find((p) => p.title === PROJECT_TITLE);
   if (existing) {
     log("project", `reusing existing #${existing.number} (${existing.id})`);
@@ -116,19 +114,14 @@ async function fetchProjectFields(projectId) {
 }
 
 async function ensureSingleSelectField(projectId, name, optionNames) {
-  const existing = (await fetchProjectFields(projectId)).find(
-    (f) => f.name === name,
-  );
+  const existing = (await fetchProjectFields(projectId)).find((f) => f.name === name);
   if (existing && existing.dataType === "SINGLE_SELECT") {
     log(`field/${name}`, `reusing existing (${existing.id})`);
     return existing;
   }
 
   const optionsLiteral = optionNames
-    .map(
-      (n) =>
-        `{ name: "${n.replace(/"/g, '\\"')}", color: GRAY, description: "" }`,
-    )
+    .map((n) => `{ name: "${n.replace(/"/g, '\\"')}", color: GRAY, description: "" }`)
     .join(", ");
 
   const created = await ghGraphQL(`
@@ -158,16 +151,10 @@ async function main() {
 
   const fieldRecords = {};
   for (const fieldDef of FIELDS) {
-    const field = await ensureSingleSelectField(
-      project.id,
-      fieldDef.name,
-      fieldDef.options,
-    );
+    const field = await ensureSingleSelectField(project.id, fieldDef.name, fieldDef.options);
     fieldRecords[fieldDef.name] = {
       id: field.id,
-      options: Object.fromEntries(
-        (field.options ?? []).map((o) => [o.name, o.id]),
-      ),
+      options: Object.fromEntries((field.options ?? []).map((o) => [o.name, o.id])),
     };
   }
 

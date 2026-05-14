@@ -108,14 +108,7 @@ async function applyBranchProtection() {
   };
 
   await ghRaw(
-    [
-      "api",
-      "-X",
-      "PUT",
-      "repos/{owner}/{repo}/branches/main/protection",
-      "--input",
-      "-",
-    ],
+    ["api", "-X", "PUT", "repos/{owner}/{repo}/branches/main/protection", "--input", "-"],
     { input: JSON.stringify(body) },
   );
 
@@ -127,10 +120,7 @@ async function main() {
   if (APPLY_PROTECTION) {
     await applyBranchProtection();
   } else {
-    log(
-      "branch-protection",
-      "skipped (rerun with --apply-protection once CI checks exist)",
-    );
+    log("branch-protection", "skipped (rerun with --apply-protection once CI checks exist)");
   }
 }
 

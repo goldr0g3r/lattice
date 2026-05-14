@@ -8,7 +8,7 @@
     "MD024": {
       // duplicate headings — fine when nested under different parents
       // (e.g. multiple "Pros" / "Cons" under different "Option" subheaders in ADRs)
-      "siblings_only": true
+      "siblings_only": true,
     },
     "MD032": false, // blanks around lists — same rationale as MD022
     "MD033": false, // inline HTML — used for HTML comments + occasional <kbd>/<sub>
@@ -17,18 +17,18 @@
     "MD034": false, // bare URLs — we use them in citations
     "MD040": true, // fenced code blocks must specify a language
     "MD046": {
-      "style": "fenced"
+      "style": "fenced",
     },
     "MD007": {
       // unordered list indent
-      "indent": 2
+      "indent": 2,
     },
     "MD025": {
       // single H1 per file
       "level": 1,
-      "front_matter_title": ""
+      "front_matter_title": "",
     },
-    "MD060": false // table column style is too pedantic for hand-typed tables
+    "MD060": false, // table column style is too pedantic for hand-typed tables
   },
   "globs": ["**/*.md"],
   "ignores": [
@@ -38,6 +38,6 @@
     "**/build/**",
     "**/.git/**",
     ".cursor/**",
-    "CHANGELOG.md"
-  ]
+    "CHANGELOG.md",
+  ],
 }

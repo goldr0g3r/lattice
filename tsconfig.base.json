@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "exactOptionalPropertyTypes": false,
+    "forceConsistentCasingInFileNames": true,
+
+    "skipLibCheck": true,
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": false,
+
+    "declaration": true,
+    "sourceMap": true,
+    "noEmit": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "@lattice/ui": ["packages/ui/src/index.ts"],
+      "@lattice/ui/*": ["packages/ui/src/*"],
+      "@lattice/core-bindings": ["packages/core-bindings/src/index.ts"],
+      "@lattice/core-bindings/*": ["packages/core-bindings/src/*"]
+    }
+  },
+  "exclude": ["**/node_modules", "**/dist", "**/build", "**/target"]
+}

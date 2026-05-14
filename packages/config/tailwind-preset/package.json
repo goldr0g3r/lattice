@@ -1,0 +1,11 @@
+{
+  "name": "@lattice/tailwind-preset",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared TailwindCSS preset that maps to Lattice design tokens. Single source of truth for theme tokens (per ADR-0010).",
+  "license": "AGPL-3.0-or-later",
+  "main": "./index.cjs",
+  "files": [
+    "index.cjs"
+  ]
+}

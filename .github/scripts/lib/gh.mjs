@@ -73,9 +73,7 @@ export async function ghGraphQL(query, variables = {}) {
   const stdout = await ghRaw(args);
   const parsed = JSON.parse(stdout);
   if (parsed.errors && parsed.errors.length) {
-    throw new Error(
-      `GraphQL error: ${parsed.errors.map((e) => e.message).join("; ")}`,
-    );
+    throw new Error(`GraphQL error: ${parsed.errors.map((e) => e.message).join("; ")}`);
   }
   return parsed.data;
 }

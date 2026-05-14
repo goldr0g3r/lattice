@@ -85,6 +85,21 @@ pnpm tauri android dev
 - Frontend: **Vitest** for unit, **Playwright** for E2E.
 - Performance: benches gated on `core/` regressions (`criterion`).
 
+### Design tokens
+
+The role-based tokens in [`packages/ui/src/tokens.css`](packages/ui/src/tokens.css)
+are the **single source of truth** ([ADR-0010](docs/decisions/0010-design-tokens-and-typography.md)).
+The Tailwind preset at [`packages/config/tailwind-preset/index.cjs`](packages/config/tailwind-preset/index.cjs)
+maps each `--token` onto a utility class.
+
+**To add a new token:**
+
+1. Declare the CSS variable in `packages/ui/src/tokens.css` (both `:root` and `[data-theme="dark"]`).
+2. Expose it in `packages/config/tailwind-preset/index.cjs` under the relevant `theme.extend.*` map.
+3. Run `pnpm tokens:check` locally. CI runs the same check.
+
+If `tokens:check` reports `missing` or `extra`, the two files have drifted; fix by editing them together.
+
 ## Issue triage labels
 
 We use a tidy label taxonomy. See [the label list](../../labels).

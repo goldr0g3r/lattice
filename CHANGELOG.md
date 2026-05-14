@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.1 PR #5** — Design-token round-trip + parity guard: `scripts/check-token-parity.mjs`
+  parses `packages/ui/src/tokens.css` and `packages/config/tailwind-preset/index.cjs`,
+  asserts every `var(--token)` reference resolves to a declared token (and vice versa),
+  with documented exclusions for font-stack vars consumed via `fontFamily`. New
+  `pnpm tokens:check` script; Vitest unit test in `packages/ui/src/tokens.test.ts`
+  exercises the same invariant; `CONTRIBUTING.md` "Design tokens" section walks
+  contributors through adding a new token.
+- **v0.1 PR #4** — React + Vite + TailwindCSS + shadcn/ui scaffolding:
+  Vite 6 + React 18 in `apps/desktop` (`vite.config.ts`, `tailwind.config.ts`,
+  `postcss.config.cjs`, strict-mode `index.html` + `src/{main,App,styles}.tsx`),
+  Tailwind preset wired to ADR-0010 token CSS, and 11 shadcn-derived
+  primitives in `packages/ui/src/components/`: `Button`, `Card`, `Dialog`,
+  `DropdownMenu`, `Input`, `Separator`, `Sheet`, `Tabs`, `Tooltip`, `Toaster`
+  (sonner), and `Command` (cmdk). Storybook is deferred to a small v0.2
+  follow-up per the "one-liner if time-pressed" clause in
+  [.github/issues/v0.1-tasks.yml](.github/issues/v0.1-tasks.yml).
+- **v0.1 PR #2** — Rust `lattice-core` crate with sqlx + SQLite per
+  [ADR-0002](docs/decisions/0002-rust-core-sqlx-sqlite.md): connection-pool
+  bootstrap (`db::init_pool` / `init_in_memory`), embedded `Migrator` reading
+  `core/lattice-core/migrations/0001_init.sql` (notes / tags / note_tags /
+  links / attachments tables + indexes), serialisable `LatticeError` enum with
+  `From` impls for `io::Error`, `sqlx::Error`, and `sqlx::migrate::MigrateError`,
+  `Note` / `Tag` / `Link` / `LinkKind` / `Attachment` IPC types deriving `ts_rs::TS`
+  exported into `packages/core-bindings/src/generated/` and re-exported from
+  `@lattice/core-bindings`, and `insta` snapshot coverage of all
+  `LatticeError` JSON variants under `core/lattice-core/tests/error_snapshot.rs`.
+- **v0.1 PR #1** — pnpm + Turborepo monorepo scaffolding per
+  [ADR-0008](docs/decisions/0008-pnpm-turborepo-monorepo.md):
+  workspace skeleton (`apps/desktop`, `packages/ui`, `packages/core-bindings`,
+  `packages/config/{eslint,tailwind,tsconfig}-preset`), Rust workspace `Cargo.toml`
+  with stub crates (`core/lattice-{core,search,ai,sync}`), root toolchain
+  (`tsconfig.base.json`, `eslint.config.mjs`, `prettier.config.cjs`, `vitest.config.ts`,
+  `.nvmrc`, `.npmrc`, `.prettierignore`), shared Tailwind preset wired to
+  ADR-0010 design tokens, and root scripts (`lint`, `typecheck`, `test`,
+  `format`, `tauri`, `tauri:dev`, `tauri:build`).
 - Initial project scaffolding: README, ARCHITECTURE, ROADMAP, CONTRIBUTING,
   CODE_OF_CONDUCT, SECURITY, `.editorconfig`, `.gitignore`.
 - `.github/` community health files: `CODEOWNERS`, pull-request template,

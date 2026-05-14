@@ -1,0 +1,43 @@
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+.turbo/
+**/.turbo/
+target/
+**/target/
+src-tauri/target/
+src-tauri/gen/
+coverage/
+.next/
+*.tsbuildinfo
+
+# Lockfiles (auto-generated)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+Cargo.lock
+
+# Project state caches
+.github/scripts/.project-state.json
+.github/scripts/node_modules/
+
+# License text (third-party formatting)
+LICENSE
+
+# Markdown files maintained outside Prettier's wrap rules
+CHANGELOG.md
+ROADMAP.md
+ARCHITECTURE.md
+README.md
+SECURITY.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+docs/vision.md
+docs/research/note-taking-landscape.md
+docs/development/github-governance.md
+docs/decisions/
+
+# Auto-generated bindings from ts-rs
+packages/core-bindings/src/generated/

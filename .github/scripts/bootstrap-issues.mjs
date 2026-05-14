@@ -41,9 +41,7 @@ async function loadState() {
   try {
     return JSON.parse(await readFile(STATE_PATH, "utf8"));
   } catch {
-    throw new Error(
-      "No .project-state.json found. Run bootstrap-project.mjs first.",
-    );
+    throw new Error("No .project-state.json found. Run bootstrap-project.mjs first.");
   }
 }
 
@@ -63,9 +61,7 @@ async function fetchExistingIssues() {
 
 async function createIssue(spec) {
   const labels =
-    spec["good-first-issue"] === true
-      ? [...spec.labels, "good first issue"]
-      : spec.labels;
+    spec["good-first-issue"] === true ? [...spec.labels, "good first issue"] : spec.labels;
 
   const args = [
     "issue",
@@ -103,10 +99,7 @@ async function replaceChildrenMarker(epicNumber, epicBody, childNumbers) {
   const newBody = epicBody.replace(/<!-- AUTO:CHILDREN -->/, list);
   if (newBody === epicBody) return; // marker was already replaced
   await ghRaw(["issue", "edit", String(epicNumber), "--body", newBody]);
-  log(
-    `  ~ link`,
-    `epic #${epicNumber} children: ${childNumbers.map((n) => `#${n}`).join(", ")}`,
-  );
+  log(`  ~ link`, `epic #${epicNumber} children: ${childNumbers.map((n) => `#${n}`).join(", ")}`);
 }
 
 async function getIssueNodeId(repo, number) {
@@ -155,13 +148,9 @@ async function setSingleSelectField(projectId, itemId, fieldId, optionId) {
 // that bootstrap-project.mjs created. The repo Milestone we passed to
 // `gh issue create --milestone` will surface in the auto Milestone field.
 function deriveFieldValues(spec) {
-  const area =
-    spec.labels.map((l) => l.match(/^area\/(.+)$/)?.[1]).find(Boolean) ?? null;
-  const priority =
-    spec.labels.map((l) => l.match(/^priority\/(.+)$/)?.[1]).find(Boolean) ??
-    null;
-  const sizeRaw =
-    spec.labels.map((l) => l.match(/^size\/(.+)$/)?.[1]).find(Boolean) ?? null;
+  const area = spec.labels.map((l) => l.match(/^area\/(.+)$/)?.[1]).find(Boolean) ?? null;
+  const priority = spec.labels.map((l) => l.match(/^priority\/(.+)$/)?.[1]).find(Boolean) ?? null;
+  const sizeRaw = spec.labels.map((l) => l.match(/^size\/(.+)$/)?.[1]).find(Boolean) ?? null;
   const size = sizeRaw ? sizeRaw.toUpperCase() : null;
   return {
     Area: area,
@@ -230,10 +219,7 @@ async function main() {
       if (!field) continue;
       const optionId = field.options[optionName];
       if (!optionId) {
-        log(
-          `  ! warn`,
-          `no option "${optionName}" on field "${fieldName}" for #${number}`,
-        );
+        log(`  ! warn`, `no option "${optionName}" on field "${fieldName}" for #${number}`);
         continue;
       }
       await setSingleSelectField(state.project.id, itemId, field.id, optionId);

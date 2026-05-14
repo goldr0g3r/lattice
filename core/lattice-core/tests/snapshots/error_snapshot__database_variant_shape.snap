@@ -1,0 +1,10 @@
+---
+source: core/lattice-core/tests/error_snapshot.rs
+expression: err
+---
+{
+  "kind": "database",
+  "details": {
+    "message": "no such table: notes"
+  }
+}

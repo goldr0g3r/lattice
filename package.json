@@ -1,0 +1,48 @@
+{
+  "name": "lattice",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lattice — a local-first, AI-native PKM for engineers and ML practitioners. Tauri 2 + Rust + React. Windows, Linux, Android.",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goldr0g3r/lattice.git"
+  },
+  "homepage": "https://github.com/goldr0g3r/lattice#readme",
+  "bugs": {
+    "url": "https://github.com/goldr0g3r/lattice/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.16.1",
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --check . --ignore-unknown",
+    "format:write": "prettier --write . --ignore-unknown",
+    "tokens:check": "node scripts/check-token-parity.mjs",
+    "clean": "turbo run clean && rimraf node_modules .turbo",
+    "tauri": "pnpm --filter @lattice/desktop tauri",
+    "tauri:dev": "pnpm --filter @lattice/desktop tauri dev",
+    "tauri:build": "pnpm --filter @lattice/desktop tauri build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.3.3",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.20.0",
+    "vitest": "^2.1.8"
+  },
+  "pnpm": {
+    "overrides": {}
+  }
+}

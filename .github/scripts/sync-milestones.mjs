@@ -24,10 +24,7 @@ async function main() {
   log("sync-milestones", `${desired.length} milestones in YAML`);
 
   /** @type {Array<{ title: string, description: string | null, state: string, number: number }>} */
-  const existing = await ghJson([
-    "api",
-    "repos/{owner}/{repo}/milestones?state=all&per_page=100",
-  ]);
+  const existing = await ghJson(["api", "repos/{owner}/{repo}/milestones?state=all&per_page=100"]);
   log("sync-milestones", `${existing.length} milestones currently on GitHub`);
 
   const existingByTitle = new Map(existing.map((m) => [m.title, m]));
@@ -58,8 +55,7 @@ async function main() {
       continue;
     }
 
-    const needsUpdate =
-      (current.description ?? "") !== description || current.state !== state;
+    const needsUpdate = (current.description ?? "") !== description || current.state !== state;
     if (needsUpdate) {
       await ghJson([
         "api",
@@ -78,10 +74,7 @@ async function main() {
     }
   }
 
-  log(
-    "sync-milestones done",
-    `+${created} created, ~${updated} updated, =${unchanged} unchanged`,
-  );
+  log("sync-milestones done", `+${created} created, ~${updated} updated, =${unchanged} unchanged`);
 }
 
 main().catch((err) => {

@@ -1,0 +1,11 @@
+---
+source: core/lattice-core/tests/error_snapshot.rs
+expression: err
+---
+{
+  "kind": "invalid_path",
+  "details": {
+    "path": "/nonexistent",
+    "reason": "directory does not exist"
+  }
+}
