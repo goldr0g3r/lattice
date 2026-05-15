@@ -68,3 +68,6 @@ ADRs are **never deleted or rewritten in place**. They're an append-only log.
 | 0015 | [Markdown flavor and custom-node serialization](0015-markdown-flavor-and-serialization.md) | Accepted | 2026-05-14 |
 | 0016 | [Image and attachment storage](0016-attachment-storage.md)          | Accepted | 2026-05-14 |
 | 0017 | [Excalidraw embed storage format](0017-excalidraw-embed-storage.md) | Accepted | 2026-05-14 |
+| 0018 | [Search query grammar](0018-search-query-grammar.md)                | Accepted | 2026-05-15 |
+| 0019 | [Graph snapshot data shape, paging, and limits](0019-graph-snapshot-data-shape.md) | Accepted | 2026-05-15 |
+| 0020 | [Backlinks staleness model](0020-backlinks-staleness-model.md)      | Accepted | 2026-05-15 |
