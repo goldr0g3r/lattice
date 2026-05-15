@@ -2291,6 +2291,7 @@ name = "lattice-search"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "criterion",
  "serde",
  "serde_json",

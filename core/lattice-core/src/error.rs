@@ -77,6 +77,27 @@ pub enum LatticeError {
         /// [`lattice_search::SearchError`].
         message: String,
     },
+
+    /// The user's search query failed to parse.
+    ///
+    /// Distinct from [`Self::Search`] so the search modal (v0.3 PR E)
+    /// can render the bad input verbatim and underline the offending
+    /// region. `span_start` / `span_end` carry the byte range from the
+    /// v0.3 [`lattice_search::query`] parser per
+    /// [ADR-0018](../../docs/decisions/0018-search-query-grammar.md).
+    #[error("invalid query `{query}`: {reason}")]
+    InvalidQuery {
+        /// Verbatim user input.
+        query: String,
+        /// Human-readable explanation, ready to render under the input.
+        reason: String,
+        /// Inclusive byte offset where the offending region begins.
+        #[ts(type = "number")]
+        span_start: u32,
+        /// Exclusive byte offset where the offending region ends.
+        #[ts(type = "number")]
+        span_end: u32,
+    },
 }
 
 impl From<io::Error> for LatticeError {
@@ -105,8 +126,20 @@ impl From<sqlx::migrate::MigrateError> for LatticeError {
 
 impl From<lattice_search::SearchError> for LatticeError {
     fn from(value: lattice_search::SearchError) -> Self {
-        LatticeError::Search {
-            message: value.to_string(),
+        match value {
+            lattice_search::SearchError::InvalidQuery {
+                query,
+                span,
+                reason,
+            } => LatticeError::InvalidQuery {
+                query,
+                reason,
+                span_start: u32::try_from(span.start).unwrap_or(u32::MAX),
+                span_end: u32::try_from(span.end).unwrap_or(u32::MAX),
+            },
+            other => LatticeError::Search {
+                message: other.to_string(),
+            },
         }
     }
 }

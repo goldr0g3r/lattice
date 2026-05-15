@@ -25,11 +25,15 @@
 mod doc;
 mod error;
 mod index;
+pub mod query;
 mod schema;
 
 pub use doc::IndexDoc;
 pub use error::{SearchError, SearchResult};
 pub use index::{drop_index_dir, Index, IndexStats};
+pub use query::{
+    parse as parse_query, DateOp, Query, DEFAULT_FIELDS, DEFAULT_FUZZY_DISTANCE, TITLE_BOOST,
+};
 pub use schema::{Fields, INDEX_DIR_NAME};
 
 /// Crate version, exposed for diagnostics.

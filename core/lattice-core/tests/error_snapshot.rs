@@ -62,3 +62,14 @@ fn search_variant_shape() {
     };
     insta::assert_json_snapshot!(err);
 }
+
+#[test]
+fn invalid_query_variant_shape() {
+    let err = LatticeError::InvalidQuery {
+        query: "tag:>foo".into(),
+        reason: "field `tag` does not accept a date comparison (use `created` or `updated`)".into(),
+        span_start: 0,
+        span_end: 3,
+    };
+    insta::assert_json_snapshot!(err);
+}

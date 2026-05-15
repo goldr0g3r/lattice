@@ -1,0 +1,13 @@
+---
+source: core/lattice-core/tests/error_snapshot.rs
+expression: err
+---
+{
+  "kind": "invalid_query",
+  "details": {
+    "query": "tag:>foo",
+    "reason": "field `tag` does not accept a date comparison (use `created` or `updated`)",
+    "span_start": 0,
+    "span_end": 3
+  }
+}
