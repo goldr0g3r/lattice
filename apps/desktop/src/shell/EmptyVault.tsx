@@ -1,7 +1,18 @@
 /**
  * Pre-vault landing surface. Shown when no vault is open — i.e. before the
- * 3-column shell mounts. Visual cousin of the reference design's centered
+ * 3-column shell mounts. Visual cousin of the reference designs' centered
  * card; same `Wordmark` primitive + `Card` shell so the aesthetic survives.
+ *
+ * # Visual polish pass (v0.2 PR #6 — `feat/shell-visual-polish`)
+ *
+ *  - **Backdrop.** Paints `--app-window-bg` so the landing card sits over
+ *    the same hairline-contrast backdrop the 3-column shell uses once a
+ *    vault opens. Removes the previous bare-`<main>` look.
+ *  - **Card.** Bumped to `--radius-lg` + `--shadow-window` so the card
+ *    feels like the same family of elevated surface as the workspace
+ *    shell. Generous internal padding so the wordmark + CTA breathe.
+ *  - **Footer.** Cold-start ms + core version moved inside the card so
+ *    the page doesn't fragment into "card + floating footnote".
  */
 
 import {
@@ -27,12 +38,12 @@ export interface EmptyVaultProps {
 
 export function EmptyVault({ onOpen, error, themeToggle, footer }: EmptyVaultProps) {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center gap-8 bg-bg-canvas p-8">
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-8 bg-window-bg p-8">
       {themeToggle && <div className="absolute right-4 top-4">{themeToggle}</div>}
-      <Card className="w-full max-w-md">
-        <CardHeader>
+      <Card className="w-full max-w-md rounded-lg shadow-window">
+        <CardHeader className="gap-3 pb-2">
           <CardTitle>
-            <Wordmark className="text-5xl text-text-primary" />
+            <Wordmark className="text-5xl tracking-tight text-text-primary" />
           </CardTitle>
           <CardDescription>
             Open a vault to start writing. The 3-column workspace mounts as soon as a vault is

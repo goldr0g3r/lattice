@@ -1,31 +1,86 @@
 /*
- * Lattice 3-column desktop-shell layout (v0.2 PR #3.5).
+ * Lattice 3-column desktop-shell layout (v0.2 PR #58 — `feat/desktop-shell-redesign`,
+ * visual polish v0.2 PR #6 — `feat/shell-visual-polish`).
  *
  * Token-driven surfaces only — every colour traces back to a
- * `--sidebar-*` / `--notelist-*` / role-based token defined in
- * `@lattice/ui/tokens.css`. The token-parity script
+ * `--sidebar-*` / `--notelist-*` / `--editor-bg` / `--app-window-bg`
+ * token declared in `@lattice/ui/tokens.css`. The token-parity script
  * (`scripts/check-token-parity.mjs`) requires every variable referenced
- * here to also exist in the Tailwind preset; the new tokens are mirrored
+ * here to also exist in the Tailwind preset; new tokens are mirrored
  * there in the same commit.
  *
- * The grid breakpoint at 960 px collapses the note list — below that we
- * fall back to a 2-column layout (sidebar + editor) so the editor body
- * stays readable on narrow Tauri windows.
+ * # Layout (v0.2 PR #58 — unchanged structure)
+ *
+ * Grid columns: `[sidebar 240px] [note-list 320px] [editor 1fr]`. The
+ * polish pass widens the note rail from 280 → 320 px so the
+ * colored-dot indicator + relative timestamp + snippet line all fit at
+ * the dark reference's density. Splitters are still out of scope.
+ *
+ * # Window card (v0.2 PR #6 — new)
+ *
+ * The 3-column grid lives inside an elevated rounded card. The body
+ * paints `--app-window-bg` behind it (a hair of contrast around the
+ * rounded corners) and the card itself wears `--shadow-window`, so the
+ * whole shell reads as a single floating panel — matching both
+ * references. The wrapper effect is achieved with margin + radius on
+ * `.lattice-shell` directly (rather than a wrapper element) so this
+ * file doesn't have to touch `WorkspaceShell.tsx`, which is owned by
+ * the ⌘K palette worker in a parallel PR.
+ *
+ * # Internal column dividers
+ *
+ * Attribute-selector borders on `.lattice-shell > aside` (sidebar) and
+ * `.lattice-shell > section[aria-label="Notes in this vault"]` (note
+ * rail) so the divider colour is centralised and the component files
+ * stay framework-agnostic. The third column is the editor stack and
+ * inherits `--editor-bg` from its own `<main>`.
+ *
+ * # Responsive collapse
+ *
+ * 1080 px shrinks the outer margin so narrower Tauri windows don't lose
+ * usable width to the bezel. 960 px collapses the note list (sidebar +
+ * editor only) and drops the window card so the editor body stays
+ * readable.
  */
 
 .lattice-shell {
   display: grid;
-  grid-template-columns: 240px 280px minmax(0, 1fr);
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  grid-template-columns: 240px 320px minmax(0, 1fr);
+  height: calc(100vh - 32px);
+  width: calc(100vw - 32px);
+  margin: 16px;
   background-color: var(--bg-canvas);
   color: var(--text-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-window);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.lattice-shell > aside[aria-label="Workspace navigation"] {
+  border-right: 1px solid var(--sidebar-divider);
+}
+
+.lattice-shell > section[aria-label="Notes in this vault"] {
+  border-right: 1px solid var(--notelist-divider);
+}
+
+@media (max-width: 1080px) {
+  .lattice-shell {
+    height: calc(100vh - 16px);
+    width: calc(100vw - 16px);
+    margin: 8px;
+  }
 }
 
 @media (max-width: 960px) {
   .lattice-shell {
     grid-template-columns: 240px minmax(0, 1fr);
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .lattice-shell > section[aria-label="Notes in this vault"] {

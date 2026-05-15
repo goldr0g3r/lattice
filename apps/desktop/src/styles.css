@@ -12,7 +12,12 @@ body,
 }
 
 body {
-  background-color: var(--bg-canvas);
+  /*
+   * Window backdrop — the colour visible around the elevated 3-column
+   * card. Inside the card itself, surfaces switch to `--bg-canvas` /
+   * `--sidebar-bg` / `--editor-bg` via the shell components.
+   */
+  background-color: var(--app-window-bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

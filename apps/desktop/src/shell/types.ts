@@ -37,7 +37,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
 
 /**
  * Render an ISO-millis timestamp as a short "5 min ago" / "2 d ago" string.
- * The formatter is pure — pass `now` from the caller so tests stay deterministic.
+ * The formatter is pure — pass `now` from the caller so tests stay
+ * deterministic. Uses `Intl.RelativeTimeFormat` with locale `"en"`
+ * (deliberately pinned so CI on Ubuntu + Windows produces byte-identical
+ * output regardless of the host's LC_ALL), and falls back to a hand-rolled
+ * short-string formatter on environments missing `Intl.RelativeTimeFormat`
+ * (e.g. very old browsers or stripped-down jsdom builds).
  */
 export function formatRelativeMs(ms: number, now: number = Date.now()): string {
   if (!Number.isFinite(ms) || ms <= 0) return "—";
@@ -46,11 +51,38 @@ export function formatRelativeMs(ms: number, now: number = Date.now()): string {
   const hour = 60 * minute;
   const day = 24 * hour;
   if (delta < minute) return "just now";
+
+  const intl = getRelativeTimeFormat();
+  if (intl) {
+    if (delta < hour) return intl.format(-Math.round(delta / minute), "minute");
+    if (delta < day) return intl.format(-Math.round(delta / hour), "hour");
+    if (delta < 30 * day) return intl.format(-Math.round(delta / day), "day");
+    const months = Math.round(delta / (30 * day));
+    if (months < 12) return intl.format(-months, "month");
+    return intl.format(-Math.round(months / 12), "year");
+  }
+
   if (delta < hour) return `${Math.round(delta / minute)} min ago`;
   if (delta < day) return `${Math.round(delta / hour)} h ago`;
   if (delta < 30 * day) return `${Math.round(delta / day)} d ago`;
   const months = Math.round(delta / (30 * day));
   return months < 12 ? `${months} mo ago` : `${Math.round(months / 12)} yr ago`;
+}
+
+let cachedRtf: Intl.RelativeTimeFormat | null | undefined;
+
+function getRelativeTimeFormat(): Intl.RelativeTimeFormat | null {
+  if (cachedRtf !== undefined) return cachedRtf;
+  try {
+    if (typeof Intl === "undefined" || typeof Intl.RelativeTimeFormat !== "function") {
+      cachedRtf = null;
+      return cachedRtf;
+    }
+    cachedRtf = new Intl.RelativeTimeFormat("en", { numeric: "auto", style: "short" });
+  } catch {
+    cachedRtf = null;
+  }
+  return cachedRtf;
 }
 
 /**
