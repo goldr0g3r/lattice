@@ -15,11 +15,24 @@
  */
 
 export { Editor, type EditorProps } from "./Editor";
-export { buildExtensions, LATTICE_NODE_NAMES, type LatticeNodeName } from "./schema";
+export {
+  buildExtensions,
+  LATTICE_NODE_NAMES,
+  type BuildExtensionsOptions,
+  type LatticeNodeName,
+} from "./schema";
 export { noteDocToProseMirror } from "./from-doc";
 export { proseMirrorToNoteDoc } from "./to-doc";
 export type { PMMark, PMNode } from "./from-doc";
 export { slashItems, type SlashItem } from "./slash-items";
+export {
+  WikiLink,
+  defaultWikiLinkOptions,
+  filterNoteCandidates,
+  type NoteCandidate,
+  type WikiLinkNavigation,
+  type WikiLinkOptions,
+} from "./extensions/wiki-link";
 export {
   PRELOADED_LANGUAGES,
   LAZY_LANGUAGES,
