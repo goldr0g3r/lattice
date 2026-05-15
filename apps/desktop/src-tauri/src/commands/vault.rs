@@ -6,7 +6,9 @@
 
 use std::path::PathBuf;
 
-use lattice_core::{config, LatticeError, Vault, VaultInfo, Watcher};
+use lattice_core::vault::LATTICE_DIR;
+use lattice_core::{config, Indexer, LatticeError, Vault, VaultInfo, Watcher};
+use lattice_search::Index as SearchIndex;
 use tauri::{AppHandle, Emitter, State};
 use tauri_plugin_dialog::DialogExt;
 
@@ -17,22 +19,60 @@ use crate::state::VaultState;
 const INDEX_EVENT: &str = "vault://index";
 
 /// Helper — open a vault and start a watcher on its root, re-emitting events
-/// through the Tauri bridge.
+/// through the Tauri bridge AND feeding them into the v0.3 live indexer.
 async fn open_and_watch(
     app: &AppHandle,
     state: &State<'_, VaultState>,
     path: &str,
 ) -> Result<VaultInfo, LatticeError> {
     let vault = Vault::open(path).await?;
-    let info = vault.info().await?;
     let path_buf = PathBuf::from(path);
+    let pool = vault.pool().clone();
+
+    // Open (or create) the per-vault Tantivy index. If the on-disk
+    // index can't be opened (missing or schema-mismatched), wipe it and
+    // create fresh — the indexer.seed_from_disk() call below will
+    // rebuild from the source-of-truth Markdown files per ADR-0004.
+    let tantivy_dir = path_buf
+        .join(LATTICE_DIR)
+        .join(lattice_search::INDEX_DIR_NAME);
+    let needed_seed = !tantivy_dir.join("meta.json").exists();
+    let search = match SearchIndex::open_or_create(&tantivy_dir) {
+        Ok(idx) => idx,
+        Err(lattice_search::SearchError::SchemaMismatch { .. }) => {
+            tracing::warn!("tantivy: schema mismatch on open; dropping and recreating index");
+            lattice_search::drop_index_dir(&tantivy_dir)?;
+            SearchIndex::create(&tantivy_dir)?
+        }
+        Err(other) => return Err(other.into()),
+    };
+
+    let indexer = Indexer::new(&path_buf, pool, search);
+
+    // First open of a non-indexed vault — walk the FS and feed every
+    // .md into the index so search has something to query on day one.
+    if needed_seed {
+        let count = indexer.seed_from_disk().await?;
+        tracing::info!(count, "indexer: seeded vault from disk");
+    }
 
     let watcher = {
         let app_for_callback = app.clone();
+        let indexer_for_callback = indexer.clone();
+        let rt = tokio::runtime::Handle::current();
         Watcher::start(&path_buf, move |event| {
             if let Err(err) = app_for_callback.emit(INDEX_EVENT, &event) {
                 tracing::warn!(error = %err, "failed to emit vault://index");
             }
+            let idx = indexer_for_callback.clone();
+            let ev = event.clone();
+            // Spawn off-thread — the notify debouncer's callback must
+            // return promptly so we don't block the next batch.
+            rt.spawn(async move {
+                if let Err(err) = idx.apply_event(&ev).await {
+                    tracing::warn!(error = %err, path = %ev.path, "indexer: apply_event failed");
+                }
+            });
         })?
     };
 
@@ -40,13 +80,21 @@ async fn open_and_watch(
         tracing::warn!(error = %err, "failed to persist last_vault");
     }
 
-    // Swap the new vault + watcher in atomically; close any previous ones.
+    // Compute info AFTER seeding so note_count reflects the freshly-
+    // indexed corpus rather than zero.
+    let info = vault.info().await?;
+
+    // Swap the new vault + watcher + indexer in atomically; close any
+    // previous ones.
     let old_vault = state.vault.lock().await.replace(vault);
     let _old_watcher = state.watcher.lock().await.replace(watcher);
+    let _old_indexer = state.indexer.lock().await.replace(indexer);
     if let Some(old) = old_vault {
         let _ = old.close().await;
     }
     // Dropping `_old_watcher` stops its background thread.
+    // Dropping `_old_indexer` releases the Tantivy writer (no commit
+    // needed — apply_event commits per batch).
 
     Ok(info)
 }
@@ -102,13 +150,17 @@ pub async fn vault_switch(
     open_and_watch(&app, &state, &path).await
 }
 
-/// Close the currently-open vault, drop its watcher, and clear the
-/// last-opened pointer.
+/// Close the currently-open vault, drop its watcher + indexer, and clear
+/// the last-opened pointer.
 #[tauri::command]
 pub async fn vault_close(state: State<'_, VaultState>) -> Result<(), LatticeError> {
     // Drop the watcher first so we don't get a final flurry of events after
     // the vault is gone.
     let _ = state.watcher.lock().await.take();
+    // Then drop the indexer so any in-flight `apply_event` from the
+    // watcher's drop window completes its commit before we close the
+    // pool out from under it.
+    let _ = state.indexer.lock().await.take();
     if let Some(vault) = state.vault.lock().await.take() {
         vault.close().await?;
     }
