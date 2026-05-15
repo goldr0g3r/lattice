@@ -14,3 +14,20 @@ path = "src/lib.rs"
 [dependencies]
 thiserror = { workspace = true }
 tracing = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tantivy = "0.26"
+ts-rs = { version = "10", features = ["chrono-impl"] }
+
+[dev-dependencies]
+tempfile = "3.14"
+criterion = { version = "0.5", features = ["html_reports"] }
+anyhow = { workspace = true }
+
+[[bench]]
+name = "reindex_all"
+harness = false
+
+[[bench]]
+name = "single_doc_add"
+harness = false
