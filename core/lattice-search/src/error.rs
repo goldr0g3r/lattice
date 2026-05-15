@@ -47,6 +47,22 @@ pub enum SearchError {
         /// Human-readable reason the mismatch was detected.
         reason: String,
     },
+
+    /// The user-typed query couldn't be parsed by [`crate::query::parse`].
+    /// Carries a byte-range span pointing at the offending region in the
+    /// original input so the search modal (v0.3 PR E) can underline it.
+    ///
+    /// `lattice-core`'s `From<SearchError> for LatticeError` impl lifts
+    /// this variant to `LatticeError::InvalidQuery { query, reason }`.
+    #[error("search: invalid query `{query}` at {span:?}: {reason}")]
+    InvalidQuery {
+        /// The full input string the user typed, verbatim.
+        query: String,
+        /// Byte range in `query` covering the offending region.
+        span: std::ops::Range<usize>,
+        /// Human-readable explanation for the modal to render.
+        reason: String,
+    },
 }
 
 /// Crate-wide `Result` alias.

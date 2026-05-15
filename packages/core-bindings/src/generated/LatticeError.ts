@@ -40,4 +40,20 @@ message: string, } } | { "kind": "search", "details": {
  * Human-readable description from the underlying
  * [`lattice_search::SearchError`].
  */
-message: string, } };
+message: string, } } | { "kind": "invalid_query", "details": { 
+/**
+ * Verbatim user input.
+ */
+query: string, 
+/**
+ * Human-readable explanation, ready to render under the input.
+ */
+reason: string, 
+/**
+ * Inclusive byte offset where the offending region begins.
+ */
+span_start: number, 
+/**
+ * Exclusive byte offset where the offending region ends.
+ */
+span_end: number, } };
