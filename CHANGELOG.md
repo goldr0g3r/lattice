@@ -102,6 +102,97 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
     autocomplete will be live against real vault contents. No
     schema / serializer changes required for that wiring — the
     interface in this PR is the contract.
+- **v0.2 PR #3.5 — desktop shell redesign (3-column workspace + note IO)**
+  (branch `feat/desktop-shell-redesign`, advances issues
+  [#34](https://github.com/goldr0g3r/lattice/issues/34) /
+  [#36](https://github.com/goldr0g3r/lattice/issues/36) /
+  [#38](https://github.com/goldr0g3r/lattice/issues/38)). Replaces the
+  single-column "open vault → mount editor" surface from v0.2 PR #2 with a
+  persistent Notion / Bear-style 3-column workspace, and lands the first
+  end-to-end Markdown read / write / create commands so the editor is
+  finally backed by real files.
+  - **Rust core** ([`core/lattice-core/src/notes.rs`](core/lattice-core/src/notes.rs)):
+    new `notes` module owning `list` (walks the vault root depth-first,
+    skips `.lattice/` + dot-dirs), `read` (returns `NoteContent { summary,
+    raw, doc }` — both raw bytes + parsed AST so the renderer can flag
+    pathological files), `write` (atomic `tmp + rename` via the canonical
+    v0.2 PR #1 serializer, byte-identical round-trip), and `create_blank`
+    (slugged title → first non-colliding `<slug>.md`, minimal `# Title`
+    seed body). Two new ts-rs types — `NoteSummary { id, path, title,
+    modified_ms, size_bytes }` and `NoteContent { summary, raw, doc }` —
+    exported into [`packages/core-bindings/src/generated/`](packages/core-bindings/src/generated/).
+    Path resolver rejects parent-directory traversal + absolute paths so
+    the IPC command can't reach outside the open vault.
+  - **Tauri IPC** ([`apps/desktop/src-tauri/src/commands/notes.rs`](apps/desktop/src-tauri/src/commands/notes.rs)):
+    `note_list` / `note_read` / `note_write` / `note_create` thin
+    pass-throughs to `lattice_core::notes`, registered in
+    [`apps/desktop/src-tauri/src/lib.rs`](apps/desktop/src-tauri/src/lib.rs).
+    `LatticeError` flows through unchanged so the renderer can type-narrow
+    on `kind`.
+  - **Shell components**
+    ([`apps/desktop/src/shell/`](apps/desktop/src/shell/)): five
+    self-contained components — `Sidebar` (240 px, wordmark + Home /
+    Notes / Settings nav + `Local vault` footer with theme toggle),
+    `NoteList` (280 px, `All Notes` header + count pill + search input +
+    one row per `NoteSummary` + `+ New note` footer button), `EditorPane`
+    (`1fr`, derived title + read-only tag chips from frontmatter + meta
+    row showing word count / mtime / save status + the unchanged
+    `<Editor>` body), `WorkspaceShell` (orchestrates the columns, owns
+    `note_list` / `note_read` / `note_write` debounced 250 ms, listens on
+    `vault://index` for external edits), and `EmptyVault` (pre-vault
+    landing card, visually refreshed). Locked design decisions D1–D8 are
+    doc-commented inline at the top of
+    [`WorkspaceShell.tsx`](apps/desktop/src/shell/WorkspaceShell.tsx).
+  - **Layout + tokens**
+    ([`apps/desktop/src/shell.css`](apps/desktop/src/shell.css)): pure CSS
+    grid `[240px] [280px] [1fr]`, no JS layout work, collapses the note
+    list under 960 px. Four new role-based tokens
+    ([`packages/ui/src/tokens.css`](packages/ui/src/tokens.css)) —
+    `--sidebar-bg`, `--sidebar-fg`, `--sidebar-fg-muted`, `--notelist-bg`
+    — covering light + dark + `prefers-color-scheme` variants, mirrored
+    in the Tailwind preset
+    ([`packages/config/tailwind-preset/index.cjs`](packages/config/tailwind-preset/index.cjs))
+    so `scripts/check-token-parity.mjs` stays green. Every shell surface
+    threads through tokens — zero hard-coded hex.
+  - **App wiring**
+    ([`apps/desktop/src/App.tsx`](apps/desktop/src/App.tsx)): trimmed from
+    265 lines to ~130. Owns theme state + vault lifecycle
+    (`open_vault_dialog` → `vault_open` → swap to `<WorkspaceShell>`;
+    `vault_close` → swap back to `<EmptyVault>`); the shell owns
+    everything note-related.
+  - **Vitest harness for `apps/desktop`** — new
+    [`apps/desktop/vitest.config.ts`](apps/desktop/vitest.config.ts)
+    (jsdom for `*.test.tsx`, node for everything else) +
+    [`src/__tests__/setup.ts`](apps/desktop/src/__tests__/setup.ts)
+    (`@testing-library/jest-dom/vitest` matchers + `window.matchMedia`
+    shim). New devDeps: `@testing-library/react@^16.1.0`,
+    `@testing-library/jest-dom@^6.6.3`,
+    `@testing-library/user-event@^14.5.2`, `jsdom@^25.0.1`. New runtime
+    dep: `lucide-react@^0.469.0` for the nav icons (already in editor).
+  - **Tests**: 17 new vitest cases — 5 in
+    [`Sidebar.test.tsx`](apps/desktop/src/__tests__/Sidebar.test.tsx)
+    (renders, active state via `aria-current="page"`, click contract,
+    vault label, theme-toggle slot); 7 in
+    [`NoteList.test.tsx`](apps/desktop/src/__tests__/NoteList.test.tsx)
+    (renders rows, selected row carries `aria-current="true"`, `onSelect`
+    fires with path, search filters by title substring, empty-search
+    hint, new-note CTA, empty vault); 2 in
+    [`WorkspaceShell.test.tsx`](apps/desktop/src/__tests__/WorkspaceShell.test.tsx)
+    (mocks `note_list` + `note_read` via `vi.mock("@tauri-apps/api/core")`,
+    asserts all three columns mount + the first note is auto-opened +
+    clicking a row swaps the editor title). Plus 7 new Rust integration
+    cases in [`core/lattice-core/src/notes.rs`](core/lattice-core/src/notes.rs)
+    (`#[cfg(test)]`) and
+    [`core/lattice-core/tests/notes_io.rs`](core/lattice-core/tests/notes_io.rs)
+    (corpus-wide `read → write` byte-identical round-trip across every
+    fixture in `tests/markdown-roundtrip/`).
+  - **Out of scope** (tracked separately): tag editing UI (needs the v0.3
+    tag index), splitter resize between columns, the reference's
+    Calendar / Shared / Folder nav (D2 — surfacing nav for absent
+    features is dishonest UX), the reference's "Upload Your File" modal
+    (depends on attachments — issue #37), the reference's top format
+    toolbar (already covered by the slash menu from PR #2 + KaTeX +
+    CodeMirror surfaces from PRs #55 / #56).
 - **v0.2 PR #5 — KaTeX math rendering (inline + block)**
   (branch `feat/katex-math-render`, math slice of issue
   [#37](https://github.com/goldr0g3r/lattice/issues/37); issue stays open

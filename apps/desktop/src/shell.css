@@ -1,0 +1,34 @@
+/*
+ * Lattice 3-column desktop-shell layout (v0.2 PR #3.5).
+ *
+ * Token-driven surfaces only — every colour traces back to a
+ * `--sidebar-*` / `--notelist-*` / role-based token defined in
+ * `@lattice/ui/tokens.css`. The token-parity script
+ * (`scripts/check-token-parity.mjs`) requires every variable referenced
+ * here to also exist in the Tailwind preset; the new tokens are mirrored
+ * there in the same commit.
+ *
+ * The grid breakpoint at 960 px collapses the note list — below that we
+ * fall back to a 2-column layout (sidebar + editor) so the editor body
+ * stays readable on narrow Tauri windows.
+ */
+
+.lattice-shell {
+  display: grid;
+  grid-template-columns: 240px 280px minmax(0, 1fr);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+}
+
+@media (max-width: 960px) {
+  .lattice-shell {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .lattice-shell > section[aria-label="Notes in this vault"] {
+    display: none;
+  }
+}

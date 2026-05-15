@@ -29,6 +29,14 @@ module.exports = {
           tertiary: "var(--accent-tertiary)",
         },
         border: "var(--border)",
+        sidebar: {
+          DEFAULT: "var(--sidebar-bg)",
+          fg: "var(--sidebar-fg)",
+          "fg-muted": "var(--sidebar-fg-muted)",
+        },
+        notelist: {
+          DEFAULT: "var(--notelist-bg)",
+        },
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Newsreader", "ui-serif", "Georgia", "serif"],
