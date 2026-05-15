@@ -1,0 +1,53 @@
+/**
+ * Lattice math-wrapper styles (v0.2 PR #5 — KaTeX rendering).
+ *
+ * Companion to `katex/dist/katex.min.css` (re-exported as
+ * `@lattice/editor/math.css`). KaTeX owns the math typography (CMU Serif,
+ * sizing tables, fonts under `katex/dist/fonts/`); this file owns the
+ * Lattice-side container around the rendered node so it sits in the
+ * editor's vertical rhythm and pulls accent colour from
+ * `@lattice/ui/tokens.css`.
+ *
+ * Two-file split (D7 in `components/MathInline.tsx`): apps load BOTH
+ *
+ *   import "@lattice/editor/math.css";          // KaTeX fonts + base
+ *   import "@lattice/editor/math-wrapper.css";  // Lattice container
+ *
+ * Splitting keeps the heavy KaTeX stylesheet opt-in for headless
+ * consumers (Markdown round-trip + NoteDoc converter tests) and keeps
+ * this file out of `Editor.css`, which the in-flight CodeMirror PR
+ * (#55, branch `feat/codemirror-code-blocks`) edits in parallel.
+ */
+
+.lattice-math {
+  /* `dataset.math` is set by the React node-view wrapper; we hang our
+     selectors off that so the rule still applies even if `as` changes. */
+}
+
+.lattice-math--inline {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.lattice-math--inline .lattice-math__render {
+  display: inline-block;
+}
+
+.lattice-math--block {
+  display: block;
+  margin: var(--space-4, 1rem) 0;
+  text-align: center;
+}
+
+.lattice-math--block .lattice-math__render {
+  display: block;
+}
+
+/*
+ * KaTeX emits a `<span class="katex-error">` when `throwOnError: false`
+ * meets malformed LaTeX (D3). KaTeX already colours it `#cc0000`; we
+ * route it through the token palette so dark mode reads correctly.
+ */
+.lattice-math .katex-error {
+  color: var(--color-danger, #cc0000);
+}

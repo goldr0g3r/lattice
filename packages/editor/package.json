@@ -20,7 +20,9 @@
       "types": "./src/tiptap/index.ts",
       "import": "./src/tiptap/index.ts"
     },
-    "./Editor.css": "./src/tiptap/Editor.css"
+    "./Editor.css": "./src/tiptap/Editor.css",
+    "./math.css": "./src/tiptap/katex-fonts.css",
+    "./math-wrapper.css": "./src/tiptap/math.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings=0",
@@ -65,6 +67,7 @@
     "@tiptap/react": "^2.10.3",
     "@tiptap/starter-kit": "^2.10.3",
     "@tiptap/suggestion": "^2.10.3",
+    "katex": "^0.16.46",
     "lucide-react": "^0.469.0",
     "mdast-util-from-markdown": "^2.0.2",
     "mdast-util-frontmatter": "^2.0.1",
@@ -81,6 +84,7 @@
   "devDependencies": {
     "@lattice/tsconfig-preset": "workspace:*",
     "@testing-library/react": "^16.1.0",
+    "@types/katex": "^0.16.8",
     "@types/mdast": "^4.0.4",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
