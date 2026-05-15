@@ -24,6 +24,17 @@
 
   --border: #ece7de;
 
+  /*
+   * Shell surfaces (v0.2 PR #3.5). Sidebar uses a deep tinted variant of
+   * `--accent-primary` so the wordmark + nav row pops on the cream canvas,
+   * the picker rail picks up `--bg-elevated` for a one-step delta from the
+   * editor pane (`--bg-surface`).
+   */
+  --sidebar-bg: #3b6f64;
+  --sidebar-fg: #f5f1ea;
+  --sidebar-fg-muted: #b8c8c2;
+  --notelist-bg: #fffbf5;
+
   --font-serif: "Newsreader", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono:
@@ -44,6 +55,11 @@
   --accent-tertiary: #a4bd52;
 
   --border: #2a3340;
+
+  --sidebar-bg: #0c1a18;
+  --sidebar-fg: #e9efe9;
+  --sidebar-fg-muted: #6f8580;
+  --notelist-bg: #131a21;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -60,5 +76,10 @@
     --accent-tertiary: #a4bd52;
 
     --border: #2a3340;
+
+    --sidebar-bg: #0c1a18;
+    --sidebar-fg: #e9efe9;
+    --sidebar-fg-muted: #6f8580;
+    --notelist-bg: #131a21;
   }
 }

@@ -19,12 +19,14 @@ pub mod db;
 pub mod error;
 pub mod logging;
 pub mod markdown;
+pub mod notes;
 pub mod telemetry;
 pub mod types;
 pub mod vault;
 pub mod watcher;
 
 pub use error::{LatticeError, LatticeResult};
+pub use notes::{NoteContent, NoteSummary};
 pub use telemetry::{TelemetryClient, TelemetrySettings};
 pub use types::{Attachment, Link, LinkKind, Note, Tag, VaultInfo};
 pub use vault::Vault;

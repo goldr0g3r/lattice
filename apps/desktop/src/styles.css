@@ -1,4 +1,5 @@
 @import "@lattice/ui/tokens.css";
+@import "./shell.css";
 
 @tailwind base;
 @tailwind components;

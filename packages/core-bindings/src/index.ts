@@ -28,4 +28,8 @@ export type { FrontmatterEntry } from "./generated/FrontmatterEntry";
 export type { Alignment } from "./generated/Alignment";
 export type { CalloutKind } from "./generated/CalloutKind";
 
+// Vault note IO surface (v0.2 PR #3.5 — `lattice_core::notes`).
+export type { NoteSummary } from "./generated/NoteSummary";
+export type { NoteContent } from "./generated/NoteContent";
+
 export const CORE_BINDINGS_VERSION = "0.1.0";

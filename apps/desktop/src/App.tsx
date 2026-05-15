@@ -1,19 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 
-import type { LatticeError, NoteDoc, VaultInfo } from "@lattice/core-bindings";
-import { Editor } from "@lattice/editor";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Separator,
-  Wordmark,
-} from "@lattice/ui";
+import type { VaultInfo } from "@lattice/core-bindings";
+import { Button } from "@lattice/ui";
+
+import { EmptyVault, WorkspaceShell, formatLatticeError } from "./shell";
 
 type Theme = "light" | "dark";
 
@@ -28,26 +20,25 @@ function isTauri(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 }
 
-function formatLatticeError(err: unknown): string {
-  if (err && typeof err === "object" && "kind" in err) {
-    const e = err as LatticeError;
-    if (e.kind === "invalid_path") {
-      return `${e.details.reason}: ${e.details.path}`;
-    }
-    return `${e.kind}: ${"message" in e.details ? e.details.message : "(no message)"}`;
-  }
-  return String(err);
-}
-
 /**
- * v0.1 PR #6 — Vault open / create / switch wired end-to-end.
+ * Root component for the Lattice desktop renderer.
  *
- * - On mount, attempts to reopen the last vault (persisted by the core via
- *   `lattice_core::config::set_last_vault`).
- * - "Open vault…" runs the folder picker, then `vault_open` against the core,
- *   then displays the resulting `VaultInfo`.
- * - Theme toggle flips `data-theme` on `<html>`, persisted to localStorage.
- * - Emits `renderer://ready` so the shell can record cold-start latency.
+ * Two top-level surfaces:
+ *
+ *  - **No vault** → [`<EmptyVault>`](./shell/EmptyVault.tsx) — centered card
+ *    with the wordmark + "Open vault…" CTA + theme toggle.
+ *  - **Vault open** → [`<WorkspaceShell>`](./shell/WorkspaceShell.tsx) —
+ *    the 3-column workspace (sidebar / note list / editor pane).
+ *
+ * `App.tsx` owns:
+ *
+ *  - the `vault` state (so the swap between the two surfaces is cheap)
+ *  - the theme toggle (so both surfaces share one source of truth, and a
+ *    theme flip survives the swap)
+ *  - the Tauri lifecycle wiring (`renderer://ready`, `cold-start`,
+ *    `vault_open` / `vault_close` / `open_vault_dialog`)
+ *
+ * The 3-column shell itself owns note list / read / write / create.
  */
 export function App() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
@@ -55,65 +46,6 @@ export function App() {
   const [pendingError, setPendingError] = useState<string | null>(null);
   const [coldStartMs, setColdStartMs] = useState<number | null>(null);
   const [coreVersion, setCoreVersion] = useState<string | null>(null);
-  const [draftDoc, setDraftDoc] = useState<NoteDoc | null>(null);
-
-  // v0.2 PR #2: in-memory demo doc so the TipTap editor has a surface to mount
-  // against while vault-file load/save is still pending. The follow-up PR
-  // (issue #34/#36/#37 and on) replaces this with real note IO.
-  const initialDoc = useMemo<NoteDoc>(
-    () => ({
-      frontmatter: { entries: [] },
-      body: [
-        {
-          type: "heading",
-          data: { level: 1, content: [{ type: "text", data: { value: "Welcome to Lattice" } }] },
-        },
-        {
-          type: "paragraph",
-          data: {
-            content: [
-              { type: "text", data: { value: "Type " } },
-              { type: "code", data: { value: "/" } },
-              {
-                type: "text",
-                data: {
-                  value:
-                    " for the slash menu. The editor round-trips through Markdown via the v0.2 PR #1 corpus.",
-                },
-              },
-            ],
-          },
-        },
-        {
-          type: "callout",
-          data: {
-            kind: "info",
-            body: [
-              {
-                type: "paragraph",
-                data: {
-                  content: [
-                    {
-                      type: "text",
-                      data: {
-                        value:
-                          "Vault file IO lands in a follow-up PR. Edits here are in-memory only.",
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      ],
-    }),
-    [],
-  );
-
-  const handleEditorChange = useCallback((doc: NoteDoc) => {
-    setDraftDoc(doc);
-  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -123,7 +55,7 @@ export function App() {
   useEffect(() => {
     if (!isTauri()) return;
     void emit("renderer://ready");
-    const unlistenPromise = listen<number>("cold-start", (e) => {
+    const unlistenColdStart = listen<number>("cold-start", (e) => {
       setColdStartMs(e.payload);
     });
     void invoke<{ crate_name: string; version: string }>("core_version").then((info) => {
@@ -141,11 +73,11 @@ export function App() {
       }
     })();
     return () => {
-      void unlistenPromise.then((unlisten) => unlisten());
+      void unlistenColdStart.then((un) => un());
     };
   }, []);
 
-  async function handleOpenVault() {
+  const handleOpenVault = useCallback(async () => {
     setPendingError(null);
     if (!isTauri()) {
       setPendingError("Open-vault flow requires the Tauri shell");
@@ -159,9 +91,9 @@ export function App() {
     } catch (err) {
       setPendingError(formatLatticeError(err));
     }
-  }
+  }, []);
 
-  async function handleCloseVault() {
+  const handleCloseVault = useCallback(async () => {
     setPendingError(null);
     if (!isTauri()) return;
     try {
@@ -170,96 +102,44 @@ export function App() {
     } catch (err) {
       setPendingError(formatLatticeError(err));
     }
-  }
+  }, []);
+
+  const themeToggle = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+    >
+      {theme === "light" ? "Dark" : "Light"}
+    </Button>
+  );
+
+  const versionInfo = (
+    <>
+      {coreVersion && <>lattice-core {coreVersion}</>}
+      {coldStartMs !== null && <> · cold start {coldStartMs} ms</>}
+    </>
+  );
 
   if (vault) {
     return (
-      <main className="flex min-h-screen flex-col gap-4 p-6">
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Wordmark className="text-2xl text-text-primary" />
-            <span className="font-mono text-xs text-text-secondary">{vault.root}</span>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleOpenVault}>
-              Switch vault…
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleCloseVault}>
-              Close
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
-            >
-              {theme === "light" ? "Dark" : "Light"}
-            </Button>
-          </div>
-        </header>
-        <Separator />
-        <section className="mx-auto w-full max-w-3xl">
-          <Editor initialDoc={initialDoc} onChange={handleEditorChange} />
-        </section>
-        {pendingError && (
-          <p role="alert" className="text-sm text-accent-secondary">
-            {pendingError}
-          </p>
-        )}
-        {coreVersion && (
-          <footer className="text-xs text-text-secondary">
-            lattice-core {coreVersion}
-            {coldStartMs !== null && <> · cold start {coldStartMs} ms</>}
-            {draftDoc && <> · {draftDoc.body.length} blocks in draft</>}
-          </footer>
-        )}
-      </main>
+      <WorkspaceShell
+        vault={vault}
+        onSwitchVault={() => void handleOpenVault()}
+        onCloseVault={() => void handleCloseVault()}
+        themeToggle={themeToggle}
+        versionInfo={versionInfo}
+      />
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
-      <div className="absolute right-4 top-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
-        >
-          {theme === "light" ? "Dark" : "Light"}
-        </Button>
-      </div>
-
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>
-            <Wordmark className="text-5xl text-text-primary" />
-          </CardTitle>
-          <CardDescription>
-            Open a vault to start writing. The TipTap editor + slash menu mounts as soon as a vault
-            is loaded.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex gap-3">
-            <Button onClick={handleOpenVault}>Open vault…</Button>
-            <Button variant="outline" disabled>
-              Settings
-            </Button>
-          </div>
-          {pendingError && (
-            <p role="alert" className="text-sm text-accent-secondary">
-              {pendingError}
-            </p>
-          )}
-          {coreVersion && (
-            <p className="text-xs text-text-secondary">
-              lattice-core {coreVersion}
-              {coldStartMs !== null && <> · cold start {coldStartMs} ms</>}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-    </main>
+    <EmptyVault
+      onOpen={() => void handleOpenVault()}
+      error={pendingError}
+      themeToggle={themeToggle}
+      footer={versionInfo}
+    />
   );
 }
