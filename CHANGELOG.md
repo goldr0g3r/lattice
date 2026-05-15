@@ -9,6 +9,68 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 PR #3 — CodeMirror 6 in fenced code blocks**
+  (branch `feat/codemirror-code-blocks`, closes
+  issue [#34](https://github.com/goldr0g3r/lattice/issues/34)). Swaps the
+  read-only `Fenced` atom node shipped in
+  [PR #54](https://github.com/goldr0g3r/lattice/pull/54) for a TipTap
+  node-view that hosts a real CodeMirror 6 editor inside every
+  ``` ```info ``` ` block:
+  - **Language registry**
+    ([`packages/editor/src/tiptap/codemirror/languages.ts`](packages/editor/src/tiptap/codemirror/languages.ts)):
+    22 preloaded entries via eager imports (javascript / typescript / jsx /
+    tsx, python, rust, go, java, cpp + c, json, yaml, markdown, html, css,
+    sql, xml, php, shell — which covers `bash` / `sh` / `zsh` — plus
+    dockerfile / lua / toml). 21 long-tail entries (ruby, perl, swift,
+    haskell, scala, kotlin, csharp, dart, objective-c, r, powershell,
+    julia, scheme, clojure, erlang, elm, groovy, diff, nginx, vb,
+    fortran) are lazy-loaded via dynamic `import()`. Common Markdown
+    aliases (`js`, `ts`, `py`, `rs`, `yml`, `md`, `bash`, `c++`, `c#`, …)
+    resolve to their canonical entries.
+  - **Token-driven theme**
+    ([`packages/editor/src/tiptap/codemirror/theme.ts`](packages/editor/src/tiptap/codemirror/theme.ts)):
+    `EditorView.theme(...)` reads `--bg-elevated`, `--text-primary`,
+    `--accent-primary`, `--border`, `--font-mono` etc. from
+    [`packages/ui/src/tokens.css`](packages/ui/src/tokens.css). No
+    hard-coded colours; the editor follows the rest of the app through
+    the same light / dark token swap (ADR-0010).
+  - **TipTap node-view**
+    ([`packages/editor/src/tiptap/codemirror/node-view.ts`](packages/editor/src/tiptap/codemirror/node-view.ts)):
+    `<pre data-fenced>` wrapper with a language-picker `<select>` header
+    and a CM6 `EditorView` host. Body sync uses CM6's `updateListener`
+    to push changes into the TipTap node via
+    `tr.setNodeAttribute(getPos(), "body", body)`; info-string sync
+    follows the same path on `<select>` change and reconfigures the
+    language `Compartment`. ArrowUp on the first line / ArrowDown on the
+    last line escape into the surrounding TipTap document; `Mod-A`
+    selects the CM6 buffer only; `Backspace` on an empty doc deletes
+    the whole fenced node. Search / multi-cursor / indent-with-tab /
+    bracket matching / autocomplete / fold gutter all ship from the
+    standard CM6 extensions.
+  - **Fenced refactor**
+    ([`packages/editor/src/tiptap/extensions/fenced.ts`](packages/editor/src/tiptap/extensions/fenced.ts)):
+    wires `addNodeView()` to the new renderer. `attrs: { info, body }`
+    is **unchanged** so the NoteDoc <-> ProseMirror converter pair in
+    `from-doc.ts` / `to-doc.ts` and its 13-fixture corpus stay green
+    with zero edits (D6 — round-trip contract preserved).
+  - **Editor styles** ([`packages/editor/src/tiptap/Editor.css`](packages/editor/src/tiptap/Editor.css)):
+    `pre[data-fenced].lattice-cm-fenced` chrome — header, dropdown,
+    rounded border, full-width host — all consuming design tokens. The
+    legacy `<pre><code>` fallback (used during SSR + clipboard) keeps a
+    matching look.
+  - **Design decisions** are locked inline at the top of
+    [`languages.ts`](packages/editor/src/tiptap/codemirror/languages.ts):
+    D1 registry shape, D2 node-view shape, D3 body sync, D4 info sync,
+    D5 keyboard escape, D6 round-trip preservation, D7 design-token
+    theme, D8 SSR / jsdom safety.
+  - **Tests**: 22 new vitest cases (`languages.test.ts` × 11, including
+    the ≥20-preloaded-entries acceptance gate + lazy-load smoke; plus
+    `node-view.test.tsx` × 3, mounting the editor under jsdom and
+    asserting the CM6 `.cm-editor` is present, the dropdown lists every
+    preloaded entry, and dropdown changes flip `attrs.info`). Existing
+    13-fixture NoteDoc<->PM conversion corpus and 26-fixture Markdown
+    round-trip corpus continue to pass with zero edits, bringing the
+    package total to **60/60 passing**.
 - **v0.2 PR #2 — TipTap block editor + slash command menu**
   (branch `feat/tiptap-editor`, closes
   issue [#33](https://github.com/goldr0g3r/lattice/issues/33)). Builds the
