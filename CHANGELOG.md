@@ -9,6 +9,96 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 — Mermaid + Excalidraw fenced embeds**
+  (branch `feat/mermaid-excalidraw-embeds`, closes
+  issue [#37](https://github.com/goldr0g3r/lattice/issues/37) alongside the
+  already-shipped KaTeX slice in
+  [PR #56](https://github.com/goldr0g3r/lattice/pull/56)). Ships the
+  Mermaid + Excalidraw rendering slices of the "engineer killers" embed
+  trio on top of the CodeMirror 6 node-view pattern that landed in
+  [PR #55](https://github.com/goldr0g3r/lattice/pull/55), per
+  [ADR-0015](docs/decisions/0015-markdown-flavor-and-serialization.md) +
+  [ADR-0017](docs/decisions/0017-excalidraw-embed-storage.md):
+  - **New embeds directory** (`packages/editor/src/tiptap/embeds/`): one
+    React node-view per embed kind plus a single dispatcher
+    ([`node-view-dispatcher.ts`](packages/editor/src/tiptap/embeds/node-view-dispatcher.ts))
+    that the `fenced` extension wires into `addNodeView()`. The
+    dispatcher routes each `fenced` node per-instance based on
+    `node.attrs.info`:
+    - `info ∈ {"mermaid"}` →
+      [`MermaidEmbed`](packages/editor/src/tiptap/embeds/mermaid.tsx) —
+      lazy-loads `mermaid` ^11 in a `useEffect`, calls
+      `mermaid.render(id, src)` with `securityLevel: "strict"`, and
+      injects the returned SVG via `dangerouslySetInnerHTML`. The
+      `theme` option tracks `document.documentElement.dataset.theme`
+      so the diagram flips with the editor's light / dark mode.
+    - `info ∈ {"excalidraw"}` →
+      [`ExcalidrawEmbed`](packages/editor/src/tiptap/embeds/excalidraw.tsx)
+      — read-only placeholder card surfacing the `.excalidraw.json`
+      sidecar path stored in the block body (per ADR-0017). The
+      `@excalidraw/excalidraw` ^0.18 dep is wired into
+      `packages/editor/package.json` in this PR so the follow-up doesn't
+      pay the lockfile-bump cost. Read-only canvas mounting lands once
+      the desktop shell exposes `vault_read_file` IPC (see Follow-up
+      below).
+    - anything else (`""`, `"typescript"`, `"rust"`, …) → falls through
+      to the CodeMirror 6 node-view shipped in PR #55, **bit-identical**.
+      The language picker, escape-keymap, and `attrs.body` update
+      plumbing are untouched.
+  - **Smallest possible `fenced` edit**
+    ([extensions/fenced.ts](packages/editor/src/tiptap/extensions/fenced.ts)):
+    swapped one import + one `addNodeView()` body. `addAttributes`,
+    `parseHTML`, and `renderHTML` are **unchanged** — the
+    NoteDoc <-> ProseMirror converter pair, the 13-fixture conversion
+    corpus
+    ([`__tests__/conversion.test.ts`](packages/editor/src/tiptap/__tests__/conversion.test.ts)),
+    and the 26-fixture Markdown round-trip corpus
+    ([`src/markdown/__tests__/roundtrip.test.ts`](packages/editor/src/markdown/__tests__/roundtrip.test.ts))
+    stay green with **zero fixture edits** (D4). The
+    `mermaid-fence.md` and `excalidraw-fence.md` fixtures round-trip
+    byte-identical.
+  - **Tests**
+    ([`__tests__/embeds.test.tsx`](packages/editor/src/tiptap/__tests__/embeds.test.tsx),
+    jsdom): 5 new vitest cases — Mermaid wrapper mounts with
+    `[data-mermaid]`, Excalidraw wrapper mounts with `[data-excalidraw]`
+    + the sidecar path is exposed, the CodeMirror fallback still
+    produces `.cm-editor` + the language picker for non-embed
+    info-strings, malformed Mermaid surfaces a `[data-mermaid-error]`
+    branch carrying the parser message and raw source (D5), and the
+    `isMermaidInfo` / `isExcalidrawInfo` predicates exported from the
+    dispatcher are case- and whitespace-insensitive.
+  - **Design decisions D1–D8** all locked inline at the top of
+    [`embeds/node-view-dispatcher.ts`](packages/editor/src/tiptap/embeds/node-view-dispatcher.ts):
+    D1 dispatch shape (one factory, three targets, info-string routing),
+    D2 Mermaid library + lazy-load, D3 Excalidraw read-only + path-only
+    body, D4 round-trip preserved, D5 Mermaid error UX, D6 design tokens
+    via inline CSS variables (Editor.css untouched — owned by the
+    parallel `feat/desktop-shell-redesign` workstream), D7 SSR / jsdom
+    safety (the conversion corpus test never pulls either lib in),
+    D8 lazy-load bundle weight.
+  - **Cold-start bundle cost (D8)**: both libraries are lazy-loaded
+    via dynamic `import()` and never appear in the editor entry chunk.
+    `mermaid` ^11 ≈ +1 MB minified pre-tree-shake (loads on the first
+    Mermaid block mount in a session); `@excalidraw/excalidraw` ^0.18
+    ≈ +280 KB minified core + ~600 KB of font/icon assets that ship
+    on demand once the v0.2 follow-up canvas is wired. Editor cold-start
+    is unchanged for users who never open a Mermaid or Excalidraw block.
+
+  **Follow-up** (NOT in this PR; queued behind issue #37):
+
+  - **Excalidraw sidecar load + read-only canvas** — once the desktop
+    shell exposes a `vault_read_file` IPC command (currently in flight
+    on the parallel `feat/desktop-shell-redesign` branch),
+    `ExcalidrawEmbed` should add a `useEffect` that resolves `body`
+    against the current vault root, loads the sibling
+    `.excalidraw.json`, and mounts a lazy-loaded `<Excalidraw>` with
+    `viewModeEnabled` + `zenModeEnabled` + the parsed scene as
+    `initialData`. The `TODO` comment at the top of
+    [`embeds/excalidraw.tsx`](packages/editor/src/tiptap/embeds/excalidraw.tsx)
+    spells out the exact wiring.
+  - **Editable Excalidraw + inline Mermaid editor UX** — out-of-scope
+    for v0.2; tracked alongside the v0.7 typed-block work and the
+    v0.9 canvas feature.
 - **v0.2 PR #4 — `[[wiki-link]]` autocomplete + click-to-navigate**
   (branch `feat/wiki-link-autocomplete`, closes
   issue [#36](https://github.com/goldr0g3r/lattice/issues/36)). Builds on

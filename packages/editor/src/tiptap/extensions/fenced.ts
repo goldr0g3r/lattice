@@ -1,16 +1,23 @@
 /**
- * Lattice fenced block — every ` ```info ` block in Markdown, including plain
- * code, ``` ```mermaid ``` `, and ``` ```excalidraw ``` `.
+ * Lattice fenced block — every ` ```info ` block in Markdown, including
+ * plain code, ``` ```mermaid ``` `, and ``` ```excalidraw ``` `.
  *
  * v0.2 PR #2 shipped this as a read-only atom node (`info` / `body` as
  * attributes, `<pre><code>` rendering, no inline editing). v0.2 PR #3
- * (this file) swaps the renderer for a TipTap node-view that mounts a real
+ * swapped the renderer for a TipTap node-view that mounts a real
  * CodeMirror 6 instance inside the block via
- * [`latticeCodeMirrorNodeView`](../codemirror/node-view.ts). The
- * `attrs: { info, body }` shape is unchanged (D6 in
- * [`codemirror/languages.ts`](../codemirror/languages.ts)) so the
- * NoteDoc <-> ProseMirror converter pair and its 13-fixture corpus stay
- * untouched.
+ * [`latticeCodeMirrorNodeView`](../codemirror/node-view.ts). v0.2 PR #6
+ * (this edit) routes ` ```mermaid ` and ` ```excalidraw ` blocks through
+ * the new [`latticeFencedNodeView`](../embeds/node-view-dispatcher.ts)
+ * dispatcher, which picks Mermaid / Excalidraw / CodeMirror per-instance
+ * based on `node.attrs.info` (D1 in the dispatcher's JSDoc). Non-embed
+ * info-strings still hand off to the same CM6 factory PR #3 wired in,
+ * bit-identical.
+ *
+ * The `attrs: { info, body }` shape, `parseHTML`, and `renderHTML` are
+ * **unchanged** (D4 in the dispatcher) — the NoteDoc <-> ProseMirror
+ * converter pair, the 13-fixture conversion corpus, and the 26-fixture
+ * Markdown round-trip corpus stay untouched and byte-identical.
  *
  * Headless contexts (vitest's default node env, the conversion corpus
  * test) never instantiate the node-view because TipTap only calls
@@ -20,7 +27,7 @@
 
 import { Node, mergeAttributes } from "@tiptap/core";
 
-import { latticeCodeMirrorNodeView } from "../codemirror/node-view";
+import { latticeFencedNodeView } from "../embeds";
 
 export const Fenced = Node.create({
   name: "fenced",
@@ -63,6 +70,6 @@ export const Fenced = Node.create({
   },
 
   addNodeView() {
-    return latticeCodeMirrorNodeView();
+    return latticeFencedNodeView();
   },
 });
