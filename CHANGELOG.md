@@ -99,6 +99,119 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
   - **Editable Excalidraw + inline Mermaid editor UX** — out-of-scope
     for v0.2; tracked alongside the v0.7 typed-block work and the
     v0.9 canvas feature.
+- **v0.2 PR #6 — ⌘K / Ctrl+K command palette**
+  (branch `feat/command-palette`, closes
+  issue [#38](https://github.com/goldr0g3r/lattice/issues/38)). Mounts a
+  keyboard-first power-user surface over the v0.2 PR #3.5 workspace
+  shell: pressing `⌘K` (macOS) or `Ctrl+K` (Windows / Linux) opens a
+  fuzzy-searchable [`shadcn command`](packages/ui/src/components/command.tsx)
+  palette (`cmdk` under the hood) listing every registered app command,
+  grouped by area, with optional keyboard-shortcut hints. Selecting a
+  row fires the command and closes the palette.
+  - **Typed registry + context**
+    ([`apps/desktop/src/commands/registry.ts`](apps/desktop/src/commands/registry.ts)):
+    `AppCommand { id, label, keywords?, group?, shortcut?, icon?, run }`
+    plus a `CommandContext` exposing the small handful of operations a
+    `run` handler is allowed to perform without coupling to Tauri or
+    React state (`openVault`, `switchVault`, `closeVault`, `openNote`,
+    `createNote`, `toggleTheme`, `setTheme`, `openSearch`,
+    `openSettings`, `togglePalette`, `toast`). `registerCommand(cmd)`
+    pushes into a module-local array and returns an `unregister` thunk;
+    `getCommands()` returns a fresh shallow copy. The shape mirrors
+    [PR #54](https://github.com/goldr0g3r/lattice/pull/54)'s
+    `SlashItem` registry so plugin authors only learn one pattern.
+  - **v0.2 built-in commands** (`builtInCommands(ctx)` in
+    `registry.ts`): Open vault…, Switch vault…, Close vault, Create
+    new note (`⌘N`), Search notes (stub — toasts "Search ships in
+    v0.3"), Toggle theme (label flips with `ctx.theme`), Open
+    settings (stub — toasts "Settings UI lands in v0.3"), Toggle
+    command palette itself (`⌘K`). Plus dynamic "Open note: <title>"
+    entries — top 20 by `modified_ms`, generated in
+    [`commands/note-commands.ts`](apps/desktop/src/commands/note-commands.ts).
+  - **Palette component**
+    ([`apps/desktop/src/components/CommandPalette.tsx`](apps/desktop/src/components/CommandPalette.tsx)):
+    pure-presentational wrapper over `CommandDialog` /
+    `CommandInput` / `CommandList` / `CommandGroup` / `CommandItem` /
+    `CommandShortcut` / `CommandEmpty` / `CommandSeparator` from
+    `@lattice/ui`. Groups commands by `group` in a stable display
+    order (Vault → Notes → Editor → View → Help → Other), composes
+    each item's `value=` from `label + keywords` so cmdk's built-in
+    fuzzy matcher handles filtering with zero custom scoring code,
+    closes the dialog before invoking `cmd.run(ctx)` via
+    `queueMicrotask` so a re-opening command (`view.palette`) sees
+    the dialog as closed first.
+  - **Shell wiring**
+    ([`apps/desktop/src/shell/WorkspaceShell.tsx`](apps/desktop/src/shell/WorkspaceShell.tsx)):
+    local `paletteOpen` state, a single global `keydown` listener
+    bound once at mount that detects `Mod+K` via `navigator.platform`
+    (Cmd on macOS, Ctrl elsewhere) and toggles the palette,
+    memoised `CommandContext` + `commands` arrays so cmdk doesn't see
+    a new identity per keystroke, and a small unobtrusive `⌘K`
+    button in the editor-pane top bar that opens the palette
+    visually. `App.tsx` now passes `theme` / `onToggleTheme` /
+    `onSetTheme` so the palette's theme command flips the app's
+    real theme, and mounts a `<Toaster />` from `@lattice/ui` so
+    `ctx.toast(...)` lights up the sonner-backed surface.
+  - **A11y primitive added**
+    ([`packages/ui/src/components/command.tsx`](packages/ui/src/components/command.tsx)):
+    `CommandDialog` now embeds a visually-hidden `DialogTitle` +
+    `DialogDescription` (defaults: "Command palette" / "Type a
+    command or search the command palette."), opt-out via
+    `description={null}`. Radix's `DialogContent` was warning loudly
+    in tests without these — the wrapper now satisfies WAI-ARIA's
+    dialog labelling requirement for every consumer.
+  - **Locked design decisions** (D1..D8 doc-commented inline at the
+    top of [`registry.ts`](apps/desktop/src/commands/registry.ts)):
+    D1 primitive (shadcn `CommandDialog` + cmdk), D2 keybind
+    (single global `keydown`, `Mod+K` via `navigator.platform`,
+    `preventDefault()` to suppress the browser's location-bar
+    shortcut), D3 registry shape, D4 built-in lock-set, D5 plugin
+    extensibility (the v0.9 SDK calls `registerCommand`), D6 fuzzy
+    match (cmdk built-in, no custom scoring), D7 fire-and-forget
+    `run` (handlers own their error UX via `ctx.toast`), D8 keyboard
+    escape from the editor (`Mod+K` doesn't conflict with TipTap or
+    CodeMirror defaults — covered by an integration test that
+    simulates `Ctrl+K` keydown).
+  - **Tests** (10 new vitest cases in
+    [`apps/desktop/src/components/__tests__/CommandPalette.test.tsx`](apps/desktop/src/components/__tests__/CommandPalette.test.tsx)):
+    4 direct-mount cases (closed → no dialog, open → grouped
+    commands render, cmdk fuzzy-filter on label + keywords, Enter
+    fires `run()` + `onOpenChange(false)`, empty-state copy),
+    3 `builtInCommands` contract cases (stable id order, theme
+    label flips with `ctx.theme`, search stub toasts), and 2
+    `WorkspaceShell` integration cases (mocked `note_list` +
+    `note_read`, simulated `Ctrl+K` keydown opens the palette and
+    renders the lock-set + a dynamic "Open note: Alpha" entry; a
+    second `Ctrl+K` press toggles it closed). Existing tests stay
+    green: 6 `Sidebar` + 7 `NoteList` + 2 `WorkspaceShell` (the
+    latter two updated to thread the new theme props), 26
+    Markdown round-trip, 13 NoteDoc<->PM conversion, 5 slash menu,
+    2 editor mount, 4 KaTeX math, 7 Rust `notes_io`.
+  - **Test harness shims**
+    ([`apps/desktop/src/__tests__/setup.ts`](apps/desktop/src/__tests__/setup.ts)):
+    no-op `ResizeObserver`, `hasPointerCapture`, `releasePointerCapture`,
+    and `scrollIntoView` polyfills so cmdk + Radix Dialog mount
+    cleanly under jsdom (which ships none of them). No production
+    behaviour change.
+  - **Deferred to v0.3** — explicitly NOT in this PR; the issue
+    [#38](https://github.com/goldr0g3r/lattice/issues/38)
+    acceptance row stays open for these and the PR comment will
+    cross-link the v0.3 follow-up.
+    - **Insert wiki-link** — needs an active TipTap `Editor`
+      reference and the open editor's view/state object.
+      `CommandContext` deliberately does not couple to the editor
+      surface (which would invert the dependency: the shell owns
+      the editor, not vice versa). v0.3 will add an "active editor
+      bus" the palette can subscribe to, then ship the
+      insert-wiki-link command on top of the wiki-link extension
+      shipped in [PR #57](https://github.com/goldr0g3r/lattice/pull/57).
+    - **Run search** — the palette entry exists as a stub that
+      focuses the rail's search box + toasts "Search ships in v0.3".
+      Full-text search itself lands in v0.3 #43; the palette will
+      grow a richer "Search notes" entry that opens the search
+      modal at that point.
+    - **Open settings** — same treatment; surfaced as a stub toast
+      until the v0.3 settings page lands.
 - **v0.2 PR #4 — `[[wiki-link]]` autocomplete + click-to-navigate**
   (branch `feat/wiki-link-autocomplete`, closes
   issue [#36](https://github.com/goldr0g3r/lattice/issues/36)). Builds on

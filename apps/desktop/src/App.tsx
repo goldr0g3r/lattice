@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 
 import type { VaultInfo } from "@lattice/core-bindings";
-import { Button } from "@lattice/ui";
+import { Button, Toaster } from "@lattice/ui";
 
 import { EmptyVault, WorkspaceShell, formatLatticeError } from "./shell";
 
@@ -124,22 +124,31 @@ export function App() {
 
   if (vault) {
     return (
-      <WorkspaceShell
-        vault={vault}
-        onSwitchVault={() => void handleOpenVault()}
-        onCloseVault={() => void handleCloseVault()}
-        themeToggle={themeToggle}
-        versionInfo={versionInfo}
-      />
+      <>
+        <WorkspaceShell
+          vault={vault}
+          onSwitchVault={() => void handleOpenVault()}
+          onCloseVault={() => void handleCloseVault()}
+          themeToggle={themeToggle}
+          versionInfo={versionInfo}
+          theme={theme}
+          onToggleTheme={() => setTheme(theme === "light" ? "dark" : "light")}
+          onSetTheme={(next) => setTheme(next)}
+        />
+        <Toaster />
+      </>
     );
   }
 
   return (
-    <EmptyVault
-      onOpen={() => void handleOpenVault()}
-      error={pendingError}
-      themeToggle={themeToggle}
-      footer={versionInfo}
-    />
+    <>
+      <EmptyVault
+        onOpen={() => void handleOpenVault()}
+        error={pendingError}
+        themeToggle={themeToggle}
+        footer={versionInfo}
+      />
+      <Toaster />
+    </>
   );
 }
