@@ -53,6 +53,11 @@ describe("Sidebar", () => {
       <Sidebar activeNav="notes" onSelectNav={() => {}} vaultLabel="/Users/me/Documents/Vault" />,
     );
     expect(screen.getByText("/Users/me/Documents/Vault")).toBeInTheDocument();
+    expect(screen.getByText("Vault")).toBeInTheDocument();
+  });
+
+  it("falls back to 'Local vault' when no vault label is supplied", () => {
+    render(<Sidebar activeNav="notes" onSelectNav={() => {}} />);
     expect(screen.getByText("Local vault")).toBeInTheDocument();
   });
 });

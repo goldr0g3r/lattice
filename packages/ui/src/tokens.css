@@ -7,6 +7,59 @@
  * class (`bg-bg-canvas`, `text-accent-primary`, …). PR #5 enforces parity
  * between this file and the preset; PR #9 wires self-hosted fonts into the
  * `--font-*` variables.
+ *
+ * # Visual polish pass (v0.2 PR #6 — `feat/shell-visual-polish`)
+ *
+ * Locked design decisions, in order:
+ *
+ *   - **D1 — light palette.** Sage-green sidebar (`--sidebar-bg: #3f6b56`)
+ *     with cream content canvas (`--bg-canvas: #faf6f0`) + the cream-tinted
+ *     note-rail (`--notelist-bg: #f7f2e9`) + pure-white editor pane
+ *     (`--bg-surface: #ffffff`). Sidebar text is near-cream (`--sidebar-fg:
+ *     #f3efe7`) so the wordmark + nav rows pop. Active nav row uses
+ *     `--sidebar-active-bg` (a darker sage tint) with a white left-edge
+ *     marker via `--sidebar-active-marker`.
+ *   - **D2 — dark palette.** Deep slate sidebar (`--sidebar-bg: #131a23`),
+ *     elevated inner card (`--sidebar-card-bg: #1d2530`) for the area that
+ *     hosts search / "+", note-list on the same slate as the sidebar but
+ *     separated by a thin border, editor on a slightly deeper slate
+ *     (`--bg-surface: #0e131b`). Active nav row is a solid blue pill
+ *     (`--sidebar-active-bg: #3b82f6`) — a separate token from the brand
+ *     `--accent-primary` (which stays teal in both themes so the rest of
+ *     the brand surfaces don't drift).
+ *   - **D3 — radius scale.** `--radius-md: 14px` / `--radius-lg: 18px` /
+ *     `--radius-xl: 20px` for the outer window card. Honoured by
+ *     `shell.css` (window frame) + the Tailwind preset (`rounded-md` etc.
+ *     stay default; we add `rounded-window` / `rounded-card` for the new
+ *     surfaces).
+ *   - **D4 — shadow scale.** `--shadow-sm` / `--shadow-md` are gentler
+ *     two-layer drops than Tailwind's defaults so the soft-card aesthetic
+ *     reads correctly on cream + slate. `--shadow-window` is the outer
+ *     3-column card's elevation — deeper, two-layer, asymmetric below.
+ *   - **D5 — typography.** Existing font tokens unchanged; we add
+ *     `--leading-tight` / `--leading-snug` for nav-row line-height (the
+ *     refs both use a tight nav). Body text + serif display kept exactly
+ *     as ADR-0010 specifies.
+ *   - **D6 — note-row status dot.** Decorative 6 px circle on each note
+ *     row. Default `--status-neutral`; the first three rows rotate
+ *     through `--status-success` / `--status-warning` / `--status-info`
+ *     for visual rhythm. The mapping isn't semantically meaningful in
+ *     v0.2 — once the v0.3 search/index lands (issues #44-#47) we can
+ *     bind these to real recency / pin / unread state. Explicit comment
+ *     in `NoteList.tsx` documents the rotation is decorative-only.
+ *   - **D7 — backwards compatibility.** Every token already referenced by
+ *     existing components (`--bg-canvas`, `--bg-surface`, `--bg-elevated`,
+ *     `--text-primary`, `--text-secondary`, `--accent-primary`,
+ *     `--accent-secondary`, `--accent-tertiary`, `--border`,
+ *     `--sidebar-bg`, `--sidebar-fg`, `--sidebar-fg-muted`,
+ *     `--notelist-bg`, `--font-serif`, `--font-sans`, `--font-mono`)
+ *     keeps its previous name. The new tokens ride alongside, never
+ *     replace.
+ *   - **D8 — token-parity gate.** `scripts/check-token-parity.mjs`
+ *     compares the `--token-name` set declared here against the
+ *     `var(--token-name)` set referenced in the Tailwind preset; every
+ *     new token is mirrored in `packages/config/tailwind-preset/index.cjs`
+ *     in the same commit so the gate stays green.
  */
 
 :root {
@@ -25,15 +78,63 @@
   --border: #ece7de;
 
   /*
-   * Shell surfaces (v0.2 PR #3.5). Sidebar uses a deep tinted variant of
-   * `--accent-primary` so the wordmark + nav row pops on the cream canvas,
-   * the picker rail picks up `--bg-elevated` for a one-step delta from the
-   * editor pane (`--bg-surface`).
+   * Shell surfaces — sidebar / note-list / inner-card / app-window backdrop.
+   * Sage-green sidebar (the "Elephant" light reference) with the cream
+   * note rail and pure-white editor pane sitting inside an elevated
+   * outer window card. `--app-window-bg` is the paint behind that card —
+   * keeps a hair of contrast around the rounded corners so the shadow
+   * reads.
    */
-  --sidebar-bg: #3b6f64;
-  --sidebar-fg: #f5f1ea;
-  --sidebar-fg-muted: #b8c8c2;
-  --notelist-bg: #fffbf5;
+  --sidebar-bg: #3f6b56;
+  --sidebar-fg: #f3efe7;
+  --sidebar-fg-muted: #c9d6cd;
+  --sidebar-card-bg: rgba(15, 28, 22, 0.22);
+  --sidebar-divider: rgba(255, 255, 255, 0.12);
+  --sidebar-active-bg: rgba(15, 28, 22, 0.35);
+  --sidebar-active-fg: #ffffff;
+  --sidebar-active-marker: #ffffff;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+
+  --notelist-bg: #f7f2e9;
+  --notelist-row-active-bg: #ffffff;
+  --notelist-row-hover-bg: rgba(15, 28, 22, 0.04);
+  --notelist-divider: #ece5d6;
+
+  --editor-bg: #ffffff;
+
+  --app-window-bg: #eef0ea;
+
+  /*
+   * Note-row status dot (D6). Default neutral; first three rows in
+   * `NoteList.tsx` rotate through success / warning / info so the rail
+   * has visual rhythm. Comment in the component documents the rotation
+   * is decorative-only — real status mapping ships with v0.3.
+   */
+  --status-success: #5db8a8;
+  --status-warning: #e0a444;
+  --status-info: #3b82f6;
+  --status-neutral: #c4b9a3;
+
+  /*
+   * Shadow scale (D4). Two-layer soft drops so the cream + slate
+   * surfaces don't get a hard line under them. `--shadow-window` is the
+   * outer 3-column card's drop — visible behind the rounded corners on
+   * `--app-window-bg`.
+   */
+  --shadow-sm: 0 1px 2px 0 rgba(20, 26, 35, 0.06);
+  --shadow-md: 0 6px 18px -8px rgba(20, 26, 35, 0.12), 0 2px 6px -2px rgba(20, 26, 35, 0.05);
+  --shadow-window:
+    0 30px 60px -25px rgba(20, 26, 35, 0.22), 0 12px 32px -16px rgba(20, 26, 35, 0.14);
+
+  /* Radius scale (D3). Soft cards in both references. */
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 20px;
+
+  /* Line-height extras (D5). Nav rows in both refs use a tight leading. */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
 
   --font-serif: "Newsreader", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -42,44 +143,90 @@
 }
 
 [data-theme="dark"] {
-  /* Dark theme — "Daydreaming" navy */
-  --bg-canvas: #0e1418;
-  --bg-surface: #161b22;
-  --bg-elevated: #1c232c;
+  /* Dark theme — "Daydreaming" navy, refreshed for the deep-slate ref */
+  --bg-canvas: #0e131b;
+  --bg-surface: #0e131b;
+  --bg-elevated: #1d2530;
 
-  --text-primary: #f5f1ea;
-  --text-secondary: #8b95a2;
+  --text-primary: #e9eff7;
+  --text-secondary: #7e8a99;
 
   --accent-primary: #5db8a8;
   --accent-secondary: #e6603d;
   --accent-tertiary: #a4bd52;
 
-  --border: #2a3340;
+  --border: #232b37;
 
-  --sidebar-bg: #0c1a18;
-  --sidebar-fg: #e9efe9;
-  --sidebar-fg-muted: #6f8580;
-  --notelist-bg: #131a21;
+  --sidebar-bg: #131a23;
+  --sidebar-fg: #e9eff7;
+  --sidebar-fg-muted: #7e8a99;
+  --sidebar-card-bg: #1d2530;
+  --sidebar-divider: rgba(255, 255, 255, 0.06);
+  --sidebar-active-bg: #3b82f6;
+  --sidebar-active-fg: #ffffff;
+  --sidebar-active-marker: transparent;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.04);
+
+  --notelist-bg: #131a23;
+  --notelist-row-active-bg: #1d2530;
+  --notelist-row-hover-bg: rgba(255, 255, 255, 0.04);
+  --notelist-divider: #1f2733;
+
+  --editor-bg: #0e131b;
+
+  --app-window-bg: #060a10;
+
+  --status-success: #4ade80;
+  --status-warning: #f5a524;
+  --status-info: #3b82f6;
+  --status-neutral: #4b5563;
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 18px -8px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+  --shadow-window: 0 30px 80px -30px rgba(0, 0, 0, 0.65), 0 16px 40px -20px rgba(0, 0, 0, 0.45);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --bg-canvas: #0e1418;
-    --bg-surface: #161b22;
-    --bg-elevated: #1c232c;
+    --bg-canvas: #0e131b;
+    --bg-surface: #0e131b;
+    --bg-elevated: #1d2530;
 
-    --text-primary: #f5f1ea;
-    --text-secondary: #8b95a2;
+    --text-primary: #e9eff7;
+    --text-secondary: #7e8a99;
 
     --accent-primary: #5db8a8;
     --accent-secondary: #e6603d;
     --accent-tertiary: #a4bd52;
 
-    --border: #2a3340;
+    --border: #232b37;
 
-    --sidebar-bg: #0c1a18;
-    --sidebar-fg: #e9efe9;
-    --sidebar-fg-muted: #6f8580;
-    --notelist-bg: #131a21;
+    --sidebar-bg: #131a23;
+    --sidebar-fg: #e9eff7;
+    --sidebar-fg-muted: #7e8a99;
+    --sidebar-card-bg: #1d2530;
+    --sidebar-divider: rgba(255, 255, 255, 0.06);
+    --sidebar-active-bg: #3b82f6;
+    --sidebar-active-fg: #ffffff;
+    --sidebar-active-marker: transparent;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.04);
+
+    --notelist-bg: #131a23;
+    --notelist-row-active-bg: #1d2530;
+    --notelist-row-hover-bg: rgba(255, 255, 255, 0.04);
+    --notelist-divider: #1f2733;
+
+    --editor-bg: #0e131b;
+
+    --app-window-bg: #060a10;
+
+    --status-success: #4ade80;
+    --status-warning: #f5a524;
+    --status-info: #3b82f6;
+    --status-neutral: #4b5563;
+
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 18px -8px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+    --shadow-window: 0 30px 80px -30px rgba(0, 0, 0, 0.65), 0 16px 40px -20px rgba(0, 0, 0, 0.45);
   }
 }

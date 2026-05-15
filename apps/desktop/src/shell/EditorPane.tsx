@@ -7,6 +7,23 @@
  * save-status hint). The body is the `<Editor>` from `@lattice/editor`;
  * we never touch its internals — that's the editor package's territory
  * and PR #55 + #56 own the in-editor format toolbars.
+ *
+ * # Visual polish pass (v0.2 PR #6 — `feat/shell-visual-polish`)
+ *
+ *  - **Title.** Bumped to 4xl serif, generous padding, matches the
+ *    "Fusion energy" headline density in the dark reference.
+ *  - **"Add tags" affordance.** Sits to the right of the tag chips
+ *    (or in their place when none exist). Disabled-looking by default
+ *    because tag editing is a follow-up PR — clicking it does nothing
+ *    today; surfacing a real "+" button would lie about the
+ *    capability. Tooltip explains "ships with v0.3 tag index" via
+ *    `title`.
+ *  - **No format toolbar.** Reference designs both show one above the
+ *    body; we deliberately don't duplicate the surface — the slash
+ *    menu owns formatting (PR #58 D4 / PRs #54-#56).
+ *  - **Editor body surface.** Background paints `--editor-bg` so the
+ *    light-mode body is true white and the dark-mode body is the
+ *    deep-slate of the dark reference.
  */
 
 import { useMemo } from "react";
@@ -52,40 +69,57 @@ export function EditorPane(props: EditorPaneProps) {
   const lastModifiedMs = modifiedMs ?? content?.summary.modified_ms;
 
   return (
-    <main aria-label="Note editor" className="flex h-full min-w-0 flex-1 flex-col bg-bg-surface">
-      <header className="border-b border-border px-10 pb-4 pt-8">
-        <h1 aria-label="Note title" className="font-serif text-3xl font-semibold text-text-primary">
-          {headerTitle}
-        </h1>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {tagChips.length === 0 ? (
-            <span className="text-xs text-text-secondary">No tags yet</span>
-          ) : (
-            tagChips.map((tag) => (
+    <main aria-label="Note editor" className="flex h-full min-w-0 flex-1 flex-col bg-editor-bg">
+      <header className="px-12 pb-5 pt-10">
+        <div className="flex items-start justify-between gap-6">
+          <h1
+            aria-label="Note title"
+            className="font-serif text-4xl font-semibold leading-tight text-text-primary"
+          >
+            {headerTitle}
+          </h1>
+          <button
+            type="button"
+            disabled
+            title="Tag editing ships with the v0.3 tag index (issue #38)"
+            className="mt-3 shrink-0 rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs font-medium text-text-secondary disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            + Add tags
+          </button>
+        </div>
+        {tagChips.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {tagChips.map((tag) => (
               <span
                 key={tag}
                 className="inline-flex items-center rounded-full border border-border bg-bg-elevated px-2.5 py-0.5 text-xs font-medium text-text-primary"
               >
                 {tag}
               </span>
-            ))
-          )}
-        </div>
-        <p className="mt-2 flex flex-wrap items-center gap-3 text-xs text-text-secondary">
-          <span>{wordCount} words</span>
+            ))}
+          </div>
+        )}
+        <p className="mt-4 flex flex-wrap items-center gap-3 text-xs text-text-secondary">
+          <span className="font-mono tabular-nums">{wordCount} words</span>
           {lastModifiedMs ? (
-            <span>
-              <span aria-hidden="true">·</span> Updated {formatRelativeMs(lastModifiedMs, nowMs)}
+            <span className="flex items-center gap-2">
+              <span aria-hidden="true" className="text-text-secondary/50">
+                ·
+              </span>
+              <span>Updated {formatRelativeMs(lastModifiedMs, nowMs)}</span>
             </span>
           ) : null}
           {saveStatus !== "idle" && (
-            <span aria-live="polite">
-              <span aria-hidden="true">·</span> {saveStatus === "saving" ? "saving…" : "saved"}
+            <span aria-live="polite" className="flex items-center gap-2">
+              <span aria-hidden="true" className="text-text-secondary/50">
+                ·
+              </span>
+              <span>{saveStatus === "saving" ? "saving\u2026" : "saved"}</span>
             </span>
           )}
         </p>
       </header>
-      <div className="flex-1 overflow-y-auto px-10 py-6" data-testid="editor-pane-body">
+      <div className="flex-1 overflow-y-auto px-12 pb-10" data-testid="editor-pane-body">
         <Editor
           key={selectedPath ?? "__welcome__"}
           initialDoc={doc}
