@@ -9,6 +9,99 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 PR #4 — `[[wiki-link]]` autocomplete + click-to-navigate**
+  (branch `feat/wiki-link-autocomplete`, closes
+  issue [#36](https://github.com/goldr0g3r/lattice/issues/36)). Builds on
+  the inline wiki-link atom shipped in
+  [PR #54](https://github.com/goldr0g3r/lattice/pull/54): typing `[[`
+  opens an autocomplete popup over a host-provided note list, ⏎ inserts
+  `[[Target|Alias]]`, clicking a rendered link fires an
+  "open-or-create" navigation callback, and a typing input rule converts
+  `[[Manual Title]]` into a wiki-link node when the user closes the
+  brackets without picking a candidate.
+  - **Extension refactor**
+    ([`packages/editor/src/tiptap/extensions/wiki-link.ts`](packages/editor/src/tiptap/extensions/wiki-link.ts)):
+    `Node.create<WikiLinkOptions>` with `addOptions()` defaulting to the
+    no-op `defaultWikiLinkOptions` (empty `getNoteTitles`, `console.info`
+    `onNavigate`). `addProseMirrorPlugins()` returns two plugins — a
+    `@tiptap/suggestion` instance with a custom
+    `findSuggestionMatch` that scans backwards for the last `[[` (D1,
+    works around the suggestion plugin's single-char `char` limitation),
+    and a small mousedown plugin (D6) that intercepts clicks on
+    `[data-wiki-link]` and forwards `{ target, alias }` to
+    `options.onNavigate`. `addInputRules()` keeps the manual
+    `[[Target]]` / `[[Target|Alias]]` typing path so users can still
+    insert links without the popup. Node `attrs` / `parseHTML` /
+    `renderHTML` are **unchanged from PR #54** so the 13-fixture
+    NoteDoc<->PM corpus and the 26-fixture Markdown round-trip corpus
+    stay green with zero fixture edits (D7).
+  - **Data-source decoupling**: the extension takes a `WikiLinkOptions`
+    shape — `getNoteTitles(query) → Promise<readonly NoteCandidate[]>`
+    for the autocomplete data source and
+    `onNavigate({ target, alias })` for click handling. The defaults
+    return `[]` / log to `console.info`, so the editor compiles
+    stand-alone and the empty-state path is what the user sees absent
+    host wiring. Wiring the real `vault_list_notes` / `vault_read_note`
+    IPC commands from the desktop shell into these callbacks is a
+    follow-up PR after `feat/desktop-shell-redesign` merges; that PR
+    will inject `getNoteTitles` (querying the watcher-backed index) and
+    `onNavigate` (open existing vs create-and-open).
+  - **React menu component**
+    ([`packages/editor/src/tiptap/components/WikiLinkMenu.tsx`](packages/editor/src/tiptap/components/WikiLinkMenu.tsx)):
+    `forwardRef` + `useImperativeHandle` exposes an `onKeyDown(event)`
+    hook for the suggestion plugin to forward arrow / enter keys
+    (mirrors the `SlashMenu` contract). Renders title + optional
+    `snippet` per candidate, hover-to-select, mousedown-to-commit.
+    Empty state shows "No matching notes" + a `Press Esc to keep typing
+    [[query]] as plain text` hint that strips the `|alias` suffix from
+    the typed query (D5).
+  - **Schema + Editor wiring**
+    ([`packages/editor/src/tiptap/schema.ts`](packages/editor/src/tiptap/schema.ts) +
+    [`Editor.tsx`](packages/editor/src/tiptap/Editor.tsx)):
+    `buildExtensions()` grows a `BuildExtensionsOptions` shape with an
+    optional `wikiLink?: Partial<WikiLinkOptions>` that gets forwarded
+    via `WikiLink.configure(...)` only when the caller actually
+    overrides something. `<Editor>` exposes the same prop and threads
+    it through. Absent both, every existing call-site (slash-menu test,
+    editor mount test, desktop App) keeps the no-op defaults.
+  - **Re-exports** ([`packages/editor/src/tiptap/index.ts`](packages/editor/src/tiptap/index.ts)):
+    `WikiLink`, `defaultWikiLinkOptions`, `filterNoteCandidates`,
+    `NoteCandidate`, `WikiLinkNavigation`, `WikiLinkOptions`, and
+    `BuildExtensionsOptions` are all public so the desktop shell can
+    inject a vault-backed data source without re-importing internals.
+  - **Design decisions** are locked inline at the top of
+    [`extensions/wiki-link.ts`](packages/editor/src/tiptap/extensions/wiki-link.ts):
+    D1 `[[` trigger via custom `findSuggestionMatch`, D2 `|`-split
+    query parsing, D3 case-insensitive substring + data-source-owned
+    ordering (no built-in recency bias), D4 ↑/↓/⏎/Esc + hover/click,
+    D5 empty-state copy, D6 click-to-navigate via a dedicated PM
+    plugin (TipTap's contenteditable swallows default anchor clicks),
+    D7 round-trip preservation, D8 SSR / jsdom safety
+    (`typeof document !== "undefined"` guard around the popper init).
+  - **Tests**: 14 new vitest cases across two new files —
+    [`__tests__/wiki-link-extension.test.ts`](packages/editor/src/tiptap/__tests__/wiki-link-extension.test.ts)
+    (7 node-env cases: extension registration, default options shape,
+    `filterNoteCandidates` ordering / case-insensitivity / alias-pipe
+    handling / array freshness, schema integration with + without
+    overrides) and
+    [`__tests__/wiki-link.test.tsx`](packages/editor/src/tiptap/__tests__/wiki-link.test.tsx)
+    (7 jsdom cases: menu opens with rows, renders titles + snippets,
+    arrow-up/-down navigation, enter command, unrelated-key passthrough,
+    empty-state copy, empty-state strips `|alias`, plus 2 `<Editor>`
+    mount tests asserting wiki-link node renders + injected options
+    don't crash). Existing **13-fixture NoteDoc<->PM conversion
+    corpus**, **26-fixture Markdown round-trip corpus**, **5 SlashMenu
+    keyboard tests**, and **2 Editor mount tests** all continue to
+    pass with **zero fixture edits**.
+  - **Follow-up wiring**: once
+    [`feat/desktop-shell-redesign`](https://github.com/goldr0g3r/lattice/issues/40)
+    lands its `vault_list_notes` / `vault_read_note` Tauri commands,
+    a small follow-up PR will pass
+    `wikiLink={{ getNoteTitles: vaultListNotes, onNavigate: openOrCreate }}`
+    from `apps/desktop/src/App.tsx` into the `<Editor>` and the
+    autocomplete will be live against real vault contents. No
+    schema / serializer changes required for that wiring — the
+    interface in this PR is the contract.
 - **v0.2 PR #5 — KaTeX math rendering (inline + block)**
   (branch `feat/katex-math-render`, math slice of issue
   [#37](https://github.com/goldr0g3r/lattice/issues/37); issue stays open

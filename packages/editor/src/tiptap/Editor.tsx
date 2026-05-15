@@ -14,6 +14,7 @@ import { useEffect, useRef } from "react";
 
 import type { Frontmatter, NoteDoc } from "@lattice/core-bindings";
 
+import type { WikiLinkOptions } from "./extensions/wiki-link";
 import { SlashCommands } from "./extensions/slash-commands";
 import { noteDocToProseMirror } from "./from-doc";
 import { buildExtensions } from "./schema";
@@ -30,16 +31,23 @@ export interface EditorProps {
   editable?: boolean;
   /** Optional class name applied to the outer `EditorContent` wrapper. */
   className?: string;
+  /**
+   * Optional `[[wiki-link]]` configuration. When omitted the extension
+   * runs with the no-op defaults (empty autocomplete + console-log
+   * navigation). The desktop shell injects a vault-backed data source +
+   * an "open or create" navigation handler here.
+   */
+  wikiLink?: Partial<WikiLinkOptions>;
 }
 
 export function Editor(props: EditorProps) {
-  const { initialDoc, onChange, placeholder, editable = true, className } = props;
+  const { initialDoc, onChange, placeholder, editable = true, className, wikiLink } = props;
   // Capture the frontmatter so the inverse conversion can hand it back on every
   // `onChange` without forcing the caller to re-attach it.
   const frontmatterRef = useRef<Frontmatter>(initialDoc.frontmatter);
 
   const editor = useEditor({
-    extensions: [...buildExtensions({ placeholder }), SlashCommands],
+    extensions: [...buildExtensions({ placeholder, wikiLink }), SlashCommands],
     content: noteDocToProseMirror(initialDoc),
     editable,
     editorProps: {

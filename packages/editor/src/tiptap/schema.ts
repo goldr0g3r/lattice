@@ -29,15 +29,28 @@ import { FootnoteDefinition, FootnoteReference } from "./extensions/footnote";
 import { HtmlBlock, HtmlInline } from "./extensions/html-block";
 import { Image } from "./extensions/image";
 import { BlockMath, InlineMath } from "./extensions/math";
-import { WikiLink } from "./extensions/wiki-link";
+import { WikiLink, type WikiLinkOptions } from "./extensions/wiki-link";
+
+export interface BuildExtensionsOptions {
+  /** Forwarded to `@tiptap/extension-placeholder`. */
+  placeholder?: string;
+  /**
+   * Forwarded to the WikiLink extension's `.configure(...)` call. Omit to
+   * keep the no-op defaults (empty suggestions list + console-log navigate)
+   * defined in `defaultWikiLinkOptions`.
+   */
+  wikiLink?: Partial<WikiLinkOptions>;
+}
 
 /**
  * Build the canonical Lattice editor extension list.
  *
  * The `placeholder` argument lets the desktop shell customise the empty-doc
- * hint without forking the schema.
+ * hint without forking the schema. The `wikiLink` argument lets the shell
+ * inject a vault-backed data source + an "open or create" navigation
+ * handler — see [`WikiLinkOptions`](./extensions/wiki-link.ts).
  */
-export function buildExtensions(options: { placeholder?: string } = {}): Extension[] {
+export function buildExtensions(options: BuildExtensionsOptions = {}): Extension[] {
   // `StarterKit` already covers paragraph, heading, bulletList, orderedList,
   // listItem, blockquote, horizontalRule (= thematicBreak), code (mark),
   // hardBreak, strike, bold, italic. We disable the bits we replace with
@@ -64,7 +77,7 @@ export function buildExtensions(options: { placeholder?: string } = {}): Extensi
     Fenced,
     InlineMath,
     BlockMath,
-    WikiLink,
+    options.wikiLink ? WikiLink.configure(options.wikiLink) : WikiLink,
     Image,
     FootnoteReference,
     FootnoteDefinition,
