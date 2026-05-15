@@ -81,8 +81,8 @@ export function ExcalidrawEmbed(props: NodeViewProps) {
           margin: 0,
         }}
       >
-        Read-only canvas preview lands once <code>vault_read_file</code> IPC ships
-        (see <code>@lattice/editor/embeds/excalidraw.tsx</code> TODO).
+        Read-only canvas preview lands once <code>vault_read_file</code> IPC ships (see{" "}
+        <code>@lattice/editor/embeds/excalidraw.tsx</code> TODO).
       </p>
     </NodeViewWrapper>
   );

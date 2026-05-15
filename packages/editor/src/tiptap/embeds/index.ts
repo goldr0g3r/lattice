@@ -26,8 +26,4 @@
 
 export { ExcalidrawEmbed } from "./excalidraw";
 export { MermaidEmbed } from "./mermaid";
-export {
-  isExcalidrawInfo,
-  isMermaidInfo,
-  latticeFencedNodeView,
-} from "./node-view-dispatcher";
+export { isExcalidrawInfo, isMermaidInfo, latticeFencedNodeView } from "./node-view-dispatcher";

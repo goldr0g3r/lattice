@@ -148,9 +148,7 @@ describe("fenced-block embeds dispatcher", () => {
   });
 
   it("falls through to CodeMirror 6 for non-embed info-strings (D1 fallback)", async () => {
-    const { container } = render(
-      <Editor initialDoc={fencedDoc("typescript", "const x = 1;\n")} />,
-    );
+    const { container } = render(<Editor initialDoc={fencedDoc("typescript", "const x = 1;\n")} />);
 
     await waitFor(() => {
       expect(container.querySelector(".cm-editor")).not.toBeNull();
@@ -161,9 +159,7 @@ describe("fenced-block embeds dispatcher", () => {
     // select on the header, `pre[data-fenced].lattice-cm-fenced` wrapper.
     const wrapper = container.querySelector("pre[data-fenced]");
     expect(wrapper?.classList.contains("lattice-cm-fenced")).toBe(true);
-    const select = container.querySelector<HTMLSelectElement>(
-      "select.lattice-cm-fenced__language",
-    );
+    const select = container.querySelector<HTMLSelectElement>("select.lattice-cm-fenced__language");
     expect(select?.value).toBe("typescript");
   });
 
@@ -174,9 +170,7 @@ describe("fenced-block embeds dispatcher", () => {
     );
 
     const { container } = render(
-      <Editor
-        initialDoc={fencedDoc("mermaid", "definitelyNotAValidDiagram --!! syntax oops\n")}
-      />,
+      <Editor initialDoc={fencedDoc("mermaid", "definitelyNotAValidDiagram --!! syntax oops\n")} />,
     );
 
     await waitFor(() => {
