@@ -8,3 +8,5 @@
 
 export { SlashMenu, type SlashMenuHandle, type SlashMenuProps } from "./SlashMenu";
 export { Editor, type EditorProps } from "../Editor";
+export { MathInline } from "./MathInline";
+export { MathBlock } from "./MathBlock";

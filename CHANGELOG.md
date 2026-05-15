@@ -9,6 +9,97 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 PR #5 — KaTeX math rendering (inline + block)**
+  (branch `feat/katex-math-render`, math slice of issue
+  [#37](https://github.com/goldr0g3r/lattice/issues/37); issue stays open
+  for the Mermaid + Excalidraw follow-ups). Renders inline `$..$` and
+  block `$$..$$` math via KaTeX inside the TipTap editor while keeping
+  the on-disk Markdown contract from PR #1 byte-identical:
+  - **Library**
+    ([`packages/editor/package.json`](packages/editor/package.json)):
+    new dependencies `katex@^0.16.46` + `@types/katex@^0.16.8`. KaTeX's
+    server-side `renderToString` works in node so jsdom tests can mount
+    the editor without polyfilling, and the bundle adds ~280 KB
+    minified — acceptable for the editor surface (D1).
+  - **React node-views**
+    ([`packages/editor/src/tiptap/components/MathInline.tsx`](packages/editor/src/tiptap/components/MathInline.tsx) +
+    [`MathBlock.tsx`](packages/editor/src/tiptap/components/MathBlock.tsx)):
+    each component reads `node.attrs.src`, calls
+    `katex.renderToString(src, { throwOnError: false, displayMode })`,
+    and injects the result via `dangerouslySetInnerHTML` inside a
+    `NodeViewWrapper`. Read-only — clicking the rendered math to edit
+    the source is a follow-up (out of scope) (D2).
+  - **Extension refactor**
+    ([`packages/editor/src/tiptap/extensions/math.ts`](packages/editor/src/tiptap/extensions/math.ts)):
+    both `InlineMath` and `BlockMath` gain `addNodeView()` returning a
+    `ReactNodeViewRenderer` against the new components. **`attrs`,
+    `parseHTML`, and `renderHTML` are unchanged** so the NoteDoc <->
+    ProseMirror converter pair in `from-doc.ts` / `to-doc.ts` and its
+    13-fixture corpus stay green with zero edits — KaTeX HTML lives
+    only inside the live `addNodeView()` DOM, never in the serialised
+    `<code data-math>` / `<pre data-math>` (D4 — round-trip preserved).
+  - **Error UX**: `katex.renderToString` with `throwOnError: false`
+    emits a `<span class="katex-error">` for malformed LaTeX and KaTeX
+    already styles that; we route its colour through `--color-danger`
+    so dark mode reads correctly (D3).
+  - **CSS delivery — two files, two import paths**
+    ([`packages/editor/src/tiptap/katex-fonts.css`](packages/editor/src/tiptap/katex-fonts.css) +
+    [`packages/editor/src/tiptap/math.css`](packages/editor/src/tiptap/math.css),
+    re-exported from `packages/editor/package.json` as
+    `@lattice/editor/math.css` (KaTeX fonts + base, a thin
+    `@import "katex/dist/katex.min.css"` shim — Node's package
+    `exports` validator forbids targets that traverse into
+    `node_modules`) and `@lattice/editor/math-wrapper.css` (Lattice
+    token-driven container, centers block math + vertical rhythm via
+    `var(--space-4)` from `@lattice/ui/tokens.css`). Downstream apps
+    load both:
+
+    ```ts
+    import "@lattice/editor/math.css";
+    import "@lattice/editor/math-wrapper.css";
+    ```
+
+    Splitting keeps the heavy KaTeX stylesheet opt-in for headless
+    consumers (Markdown round-trip + NoteDoc converter tests) and keeps
+    KaTeX out of [`Editor.css`](packages/editor/src/tiptap/Editor.css),
+    which the in-flight CodeMirror PR ([#55](https://github.com/goldr0g3r/lattice/pull/55))
+    edits in parallel (D6 / D7).
+  - **SSR / jsdom safety**: `renderToString` is pure (no DOM access) so
+    the import graph stays side-effect free. TipTap only spins up
+    `addNodeView()` inside a live `EditorView`, which the conversion
+    corpus test never instantiates — so the `node` env vitest run for
+    `conversion.test.ts` and the markdown round-trip suite continue to
+    pass without any KaTeX involvement (D5).
+  - **Design decisions** are locked inline at the top of
+    [`components/MathInline.tsx`](packages/editor/src/tiptap/components/MathInline.tsx):
+    D1 library, D2 node-view shape, D3 error UX, D4 round-trip
+    preservation, D5 SSR / jsdom guarantee, D6 design tokens, D7 CSS
+    two-file split, D8 Mermaid + Excalidraw deferral.
+  - **Tests**: 4 new vitest cases in
+    [`__tests__/math-rendering.test.tsx`](packages/editor/src/tiptap/__tests__/math-rendering.test.tsx)
+    mount the editor under jsdom and assert: inline math wrapper carries
+    `.katex`, block math wrapper carries `.katex-display` + `.katex`,
+    malformed LaTeX renders a `.katex-error` span, and the two new
+    components are wired into the barrel. Existing **13-fixture
+    NoteDoc <-> PM conversion corpus** and **26-fixture Markdown
+    round-trip corpus** continue to pass with **zero fixture edits**;
+    Rust `markdown_roundtrip` test still byte-identical for the
+    `math-inline-block.md` fixture. Package total: **64/64 passing**
+    (was 60/60).
+  - **Deferred** (D8) — explicitly NOT in this PR, queue behind the
+    CodeMirror node-view pattern landing in
+    [PR #55](https://github.com/goldr0g3r/lattice/pull/55):
+    - **Mermaid fenced renderer** — `mermaid.render()` inside a
+      `Fenced` info-string-driven branch will reuse the CodeMirror
+      node-view shape so all three embeds (math / mermaid /
+      excalidraw) share one pattern.
+    - **Excalidraw embeds** — `.excalidraw.json` sidecar + PNG
+      snapshot per [ADR-0017](docs/decisions/0017-excalidraw-embed-storage-format.md);
+      depends on the same node-view pattern and on a vault-attachment
+      pipeline (out of v0.2 scope until PR #6 lands).
+    - **Inline math editor UX** — double-click the rendered KaTeX to
+      drop into a popover that edits `attrs.src`, with live-preview
+      KaTeX render on each keystroke.
 - **v0.2 PR #3 — CodeMirror 6 in fenced code blocks**
   (branch `feat/codemirror-code-blocks`, closes
   issue [#34](https://github.com/goldr0g3r/lattice/issues/34)). Swaps the

@@ -1,0 +1,16 @@
+/**
+ * Thin re-export of `katex/dist/katex.min.css`.
+ *
+ * Re-exported from `@lattice/editor` as `./math.css` (D7 in
+ * `components/MathInline.tsx`) so the desktop shell can opt in to KaTeX
+ * fonts + base styles with a single import:
+ *
+ *   import "@lattice/editor/math.css";
+ *
+ * The companion file `./math-wrapper.css` (`src/tiptap/math.css`) carries
+ * the Lattice token-driven container; load both. We can't point
+ * `exports` directly at `katex/dist/katex.min.css` because Node's
+ * package-`exports` validator forbids `node_modules/…` targets.
+ */
+
+@import "katex/dist/katex.min.css";
