@@ -83,7 +83,7 @@ pub async fn list(vault: &Vault) -> LatticeResult<Vec<NoteSummary>> {
     let mut out = Vec::new();
     walk(vault.root(), vault.root(), &mut out).await?;
     // Newest first — matches the picker-rail UX everyone expects.
-    out.sort_by(|a, b| b.modified_ms.cmp(&a.modified_ms));
+    out.sort_by_key(|s| std::cmp::Reverse(s.modified_ms));
     Ok(out)
 }
 
