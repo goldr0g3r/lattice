@@ -2251,6 +2251,7 @@ dependencies = [
  "criterion",
  "dirs 5.0.1",
  "insta",
+ "lattice-search",
  "notify",
  "notify-debouncer-full",
  "pretty_assertions",
@@ -2258,6 +2259,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml_ng",
+ "sha2",
  "sqlx",
  "tempfile",
  "thiserror 2.0.18",
@@ -2274,6 +2276,7 @@ name = "lattice-desktop"
 version = "0.1.0"
 dependencies = [
  "lattice-core",
+ "lattice-search",
  "serde",
  "serde_json",
  "tauri",

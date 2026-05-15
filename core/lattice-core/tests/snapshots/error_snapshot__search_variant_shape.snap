@@ -1,0 +1,10 @@
+---
+source: core/lattice-core/tests/error_snapshot.rs
+expression: err
+---
+{
+  "kind": "search",
+  "details": {
+    "message": "tantivy: opening directory: meta.json missing"
+  }
+}

@@ -35,6 +35,8 @@ tracing-appender = "0.2"
 tracing-subscriber = { workspace = true }
 pulldown-cmark = { version = "0.12", default-features = false }
 serde_yaml_ng = "0.10"
+sha2 = "0.10"
+lattice-search = { path = "../lattice-search" }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
@@ -58,4 +60,8 @@ harness = false
 
 [[bench]]
 name = "watcher_latency"
+harness = false
+
+[[bench]]
+name = "indexer_apply"
 harness = false

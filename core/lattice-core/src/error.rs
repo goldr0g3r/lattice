@@ -65,6 +65,18 @@ pub enum LatticeError {
         /// Human-readable description.
         message: String,
     },
+
+    /// A search-index operation failed (Tantivy IO, schema mismatch, etc.).
+    ///
+    /// Surfaced by the v0.3 [`crate::Indexer`] when the on-disk Tantivy
+    /// store rejects an add / delete / commit; the renderer logs the
+    /// message and the indexer falls back to a full reseed.
+    #[error("search error: {message}")]
+    Search {
+        /// Human-readable description from the underlying
+        /// [`lattice_search::SearchError`].
+        message: String,
+    },
 }
 
 impl From<io::Error> for LatticeError {
@@ -86,6 +98,14 @@ impl From<sqlx::Error> for LatticeError {
 impl From<sqlx::migrate::MigrateError> for LatticeError {
     fn from(value: sqlx::migrate::MigrateError) -> Self {
         LatticeError::Migration {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<lattice_search::SearchError> for LatticeError {
+    fn from(value: lattice_search::SearchError) -> Self {
+        LatticeError::Search {
             message: value.to_string(),
         }
     }

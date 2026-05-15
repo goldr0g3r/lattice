@@ -54,3 +54,11 @@ fn telemetry_variant_shape() {
     };
     insta::assert_json_snapshot!(err);
 }
+
+#[test]
+fn search_variant_shape() {
+    let err = LatticeError::Search {
+        message: "tantivy: opening directory: meta.json missing".into(),
+    };
+    insta::assert_json_snapshot!(err);
+}

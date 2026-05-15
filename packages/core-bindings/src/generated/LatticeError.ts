@@ -35,4 +35,9 @@ id: string, } } | { "kind": "telemetry", "details": {
 /**
  * Human-readable description.
  */
+message: string, } } | { "kind": "search", "details": { 
+/**
+ * Human-readable description from the underlying
+ * [`lattice_search::SearchError`].
+ */
 message: string, } };
