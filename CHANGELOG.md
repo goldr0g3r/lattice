@@ -9,6 +9,54 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ### Added
 
+- **v0.2 PR #2 — TipTap block editor + slash command menu**
+  (branch `feat/tiptap-editor`, closes
+  issue [#33](https://github.com/goldr0g3r/lattice/issues/33)). Builds the
+  React editor surface on top of the `NoteDoc` AST shipped in PR #1:
+  - **Schema** ([`packages/editor/src/tiptap/schema.ts`](packages/editor/src/tiptap/schema.ts)):
+    StarterKit (paragraph, headings, lists, blockquote, hr, hard-break,
+    marks) + GFM tables + GFM task lists + 11 Lattice-specific extensions
+    ([`callout`](packages/editor/src/tiptap/extensions/callout.ts),
+    [`fenced`](packages/editor/src/tiptap/extensions/fenced.ts),
+    [`blockMath` / `inlineMath`](packages/editor/src/tiptap/extensions/math.ts),
+    [`wikiLink`](packages/editor/src/tiptap/extensions/wiki-link.ts),
+    [`image`](packages/editor/src/tiptap/extensions/image.ts),
+    [`footnoteRef` / `footnoteDefinition`](packages/editor/src/tiptap/extensions/footnote.ts),
+    [`htmlBlock` / `htmlInline`](packages/editor/src/tiptap/extensions/html-block.ts)).
+    Every `NoteDoc` `Block` / `Inline` variant maps to exactly one TipTap
+    node or mark, enforced by `LATTICE_NODE_NAMES`.
+  - **Converters** ([`from-doc.ts`](packages/editor/src/tiptap/from-doc.ts) /
+    [`to-doc.ts`](packages/editor/src/tiptap/to-doc.ts)): lossless pure
+    functions between `NoteDoc` and ProseMirror JSON. The conversion
+    corpus test in
+    [`__tests__/conversion.test.ts`](packages/editor/src/tiptap/__tests__/conversion.test.ts)
+    runs all 13 fixtures from `tests/markdown-roundtrip/` through the
+    pair and asserts deep equality — composed with the v0.2 PR #1
+    serializer this gives `disk → editor → disk` byte-identical
+    round-trip.
+  - **Slash command menu**
+    ([`extensions/slash-commands.ts`](packages/editor/src/tiptap/extensions/slash-commands.ts) +
+    [`components/SlashMenu.tsx`](packages/editor/src/tiptap/components/SlashMenu.tsx) +
+    [`slash-items.ts`](packages/editor/src/tiptap/slash-items.ts)):
+    `/` opens a `tippy.js`-anchored React popup with fuzzy-filtered
+    insert commands (paragraph, H1-H3, bullet / ordered / task list,
+    blockquote, callout × 5 kinds, code block, math block, 3×3 table,
+    divider), keyboard-only navigation (↑/↓/⏎/Esc), and `lucide-react`
+    icons.
+  - **`Editor` React component**
+    ([`Editor.tsx`](packages/editor/src/tiptap/Editor.tsx) +
+    [`Editor.css`](packages/editor/src/tiptap/Editor.css)): wraps
+    `@tiptap/react`'s `useEditor`, takes `initialDoc: NoteDoc`, emits
+    `onChange(doc: NoteDoc)`. Styles consume design tokens from
+    `@lattice/ui/tokens.css` only (no hard-coded colours).
+  - **Desktop shell** wires `<Editor>` into
+    [`apps/desktop/src/App.tsx`](apps/desktop/src/App.tsx) as the main
+    surface once a vault is open (in-memory demo document; vault file
+    IO ships in a follow-up PR).
+  - **Tests**: 46 vitest cases across 4 files (existing 26 markdown
+    round-trip + 13 NoteDoc<->PM conversion + 5 SlashMenu keyboard +
+    2 Editor mount); jsdom environment auto-selected for `*.test.tsx`
+    via [`packages/editor/vitest.config.ts`](packages/editor/vitest.config.ts).
 - **v0.2 PR #1 — Markdown round-trip + golden corpus**
   ([`feat/markdown-roundtrip`](https://github.com/goldr0g3r/lattice/pull/53),
   issue [#35](https://github.com/goldr0g3r/lattice/issues/35)). Lands the

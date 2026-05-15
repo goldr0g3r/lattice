@@ -1,0 +1,220 @@
+/**
+ * Lattice editor styles.
+ *
+ * Every colour / spacing value pulls from the design tokens exposed by
+ * `@lattice/ui/tokens.css` (loaded once by the desktop shell). Adding a new
+ * hard-coded value here is a design-system violation — surface it in
+ * `tokens.css` first and reference the variable.
+ */
+
+.lattice-editor-prose {
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  outline: none;
+}
+
+.lattice-editor-prose:focus,
+.lattice-editor-prose:focus-visible {
+  outline: none;
+}
+
+.lattice-editor-prose > * + * {
+  margin-top: var(--space-4);
+}
+
+.lattice-editor-prose h1,
+.lattice-editor-prose h2,
+.lattice-editor-prose h3,
+.lattice-editor-prose h4,
+.lattice-editor-prose h5,
+.lattice-editor-prose h6 {
+  color: var(--color-fg);
+  font-family: var(--font-display, var(--font-sans));
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
+.lattice-editor-prose h1 {
+  font-size: var(--text-3xl);
+}
+.lattice-editor-prose h2 {
+  font-size: var(--text-2xl);
+}
+.lattice-editor-prose h3 {
+  font-size: var(--text-xl);
+}
+.lattice-editor-prose h4,
+.lattice-editor-prose h5,
+.lattice-editor-prose h6 {
+  font-size: var(--text-lg);
+}
+
+.lattice-editor-prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lattice-editor-prose code {
+  background: var(--color-muted);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  padding: 0 var(--space-1);
+}
+
+.lattice-editor-prose pre[data-fenced],
+.lattice-editor-prose pre[data-html-block],
+.lattice-editor-prose pre[data-math="block"] {
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-x: auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+.lattice-editor-prose pre[data-fenced] code,
+.lattice-editor-prose pre[data-html-block] code,
+.lattice-editor-prose pre[data-math="block"] code {
+  background: transparent;
+  padding: 0;
+}
+
+.lattice-editor-prose blockquote {
+  border-left: 3px solid var(--color-border);
+  color: var(--color-fg-muted);
+  padding-left: var(--space-4);
+}
+
+.lattice-editor-prose aside[data-callout] {
+  border: 1px solid var(--color-border);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.lattice-editor-prose aside[data-callout="note"] {
+  border-left-color: var(--color-callout-note, var(--color-accent));
+}
+.lattice-editor-prose aside[data-callout="tip"] {
+  border-left-color: var(--color-callout-tip, var(--color-accent));
+}
+.lattice-editor-prose aside[data-callout="info"] {
+  border-left-color: var(--color-callout-info, var(--color-accent));
+}
+.lattice-editor-prose aside[data-callout="warning"] {
+  border-left-color: var(--color-callout-warning, var(--color-warning, var(--color-accent)));
+}
+.lattice-editor-prose aside[data-callout="caution"] {
+  border-left-color: var(--color-callout-caution, var(--color-danger, var(--color-accent)));
+}
+
+.lattice-editor-prose ul,
+.lattice-editor-prose ol {
+  padding-left: var(--space-6);
+}
+
+.lattice-editor-prose ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.lattice-editor-prose ul[data-type="taskList"] li {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.lattice-editor-prose hr {
+  background: var(--color-border);
+  border: 0;
+  height: 1px;
+  margin: var(--space-6) 0;
+}
+
+.lattice-editor-prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.lattice-editor-prose th,
+.lattice-editor-prose td {
+  border: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+
+.lattice-editor-prose th {
+  background: var(--color-muted);
+  font-weight: 600;
+}
+
+.lattice-editor-prose a[data-wiki-link] {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-1);
+  text-decoration: none;
+}
+
+.lattice-editor-prose code[data-math="inline"] {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.lattice-editor-prose sup[data-footnote-ref] {
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+/* Placeholder (`@tiptap/extension-placeholder`) renders a single text node
+   with `data-placeholder="…"` when the editor body is empty. */
+.lattice-editor-prose p.is-editor-empty:first-child::before {
+  color: var(--color-fg-muted);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Slash command popover (rendered by tippy.js into document.body). */
+.lattice-slash-menu {
+  background: var(--color-bg-elevated, var(--color-bg));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  max-height: 320px;
+  min-width: 220px;
+  overflow-y: auto;
+  padding: var(--space-1);
+}
+
+.lattice-slash-item {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-fg);
+  cursor: pointer;
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  width: 100%;
+}
+
+.lattice-slash-item[data-slash-item-active="true"],
+.lattice-slash-item:hover {
+  background: var(--color-muted);
+}
+
+.lattice-slash-empty {
+  color: var(--color-fg-muted);
+  padding: var(--space-2) var(--space-3);
+}
