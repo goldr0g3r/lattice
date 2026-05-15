@@ -100,6 +100,9 @@ describe("WorkspaceShell", () => {
         onCloseVault={() => {}}
         themeToggle={null}
         versionInfo={null}
+        theme="light"
+        onToggleTheme={() => {}}
+        onSetTheme={() => {}}
       />,
     );
 
@@ -141,6 +144,9 @@ describe("WorkspaceShell", () => {
         onCloseVault={() => {}}
         themeToggle={null}
         versionInfo={null}
+        theme="light"
+        onToggleTheme={() => {}}
+        onSetTheme={() => {}}
       />,
     );
 

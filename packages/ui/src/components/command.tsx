@@ -4,7 +4,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 
 import { cn } from "../lib/utils";
-import { Dialog, DialogContent } from "./dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./dialog";
 
 export const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -21,12 +21,36 @@ export const Command = React.forwardRef<
 ));
 Command.displayName = CommandPrimitive.displayName;
 
-export type CommandDialogProps = DialogProps;
+export interface CommandDialogProps extends DialogProps {
+  /**
+   * Screen-reader title for the command dialog. Rendered visually-hidden
+   * so the surface stays unchanged. Defaults to "Command palette".
+   * Radix's `DialogContent` warns loudly when no `DialogTitle` is
+   * mounted, so we always render one.
+   */
+  title?: string;
+  /**
+   * Screen-reader description for the command dialog. Visually hidden.
+   * Defaults to "Type a command or search the command palette." Pass
+   * `null` to opt out entirely (Radix still allows that with
+   * `aria-describedby={undefined}`).
+   */
+  description?: string | null;
+}
 
-export function CommandDialog({ children, ...props }: CommandDialogProps) {
+export function CommandDialog({
+  children,
+  title = "Command palette",
+  description = "Type a command or search the command palette.",
+  ...props
+}: CommandDialogProps) {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0">
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        {description !== null && (
+          <DialogDescription className="sr-only">{description}</DialogDescription>
+        )}
         <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-text-secondary [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>

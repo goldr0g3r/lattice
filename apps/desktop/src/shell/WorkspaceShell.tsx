@@ -45,17 +45,39 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
+import { TerminalSquare } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { NoteContent, NoteDoc, NoteSummary, VaultInfo } from "@lattice/core-bindings";
-import { Button } from "@lattice/ui";
+import { Button, toast } from "@lattice/ui";
 
+import {
+  builtInCommands,
+  getCommands,
+  type AppCommand,
+  type CommandContext,
+  type CommandTheme,
+} from "../commands/registry";
+import { noteCommands } from "../commands/note-commands";
+import { CommandPalette } from "../components/CommandPalette";
 import { EditorPane, type SaveStatus } from "./EditorPane";
 import { NoteList } from "./NoteList";
 import { Sidebar } from "./Sidebar";
 import { formatLatticeError, type NavId } from "./types";
 
 const AUTO_SAVE_DEBOUNCE_MS = 250;
+
+/**
+ * `navigator.platform` is what every cross-platform "is this a Mac"
+ * detector still reaches for — `userAgentData.platform` isn't shipped in
+ * our Tauri WebView yet, and a touch-based / no-`navigator` environment
+ * (jsdom, SSR) sees `Mod+K` as Ctrl+K, which matches every other desktop
+ * surface in the app.
+ */
+function isMacPlatform(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /mac|iphone|ipad|ipod/i.test(navigator.platform || "");
+}
 
 function welcomeDoc(): NoteDoc {
   return {
@@ -107,10 +129,17 @@ export interface WorkspaceShellProps {
   themeToggle: React.ReactNode;
   /** Cold-start ms + core version, surfaced in the editor-pane footer. */
   versionInfo: React.ReactNode;
+  /** Current theme — needed by the command palette's "Toggle theme" entry. */
+  theme: CommandTheme;
+  /** Flip the theme — wired through to the palette `ctx.toggleTheme`. */
+  onToggleTheme: () => void;
+  /** Set the theme to an explicit value (`ctx.setTheme`). */
+  onSetTheme: (theme: CommandTheme) => void;
 }
 
 export function WorkspaceShell(props: WorkspaceShellProps) {
-  const { vault, onSwitchVault, onCloseVault, themeToggle } = props;
+  const { vault, onSwitchVault, onCloseVault, themeToggle, theme, onToggleTheme, onSetTheme } =
+    props;
 
   const [activeNav, setActiveNav] = useState<NavId>("notes");
   const [notes, setNotes] = useState<NoteSummary[]>([]);
@@ -118,6 +147,7 @@ export function WorkspaceShell(props: WorkspaceShellProps) {
   const [activeContent, setActiveContent] = useState<NoteContent | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [pendingError, setPendingError] = useState<string | null>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestDocRef = useRef<NoteDoc | null>(null);
@@ -249,6 +279,82 @@ export function WorkspaceShell(props: WorkspaceShellProps) {
     return emptyDoc();
   }, [activeContent, notes.length]);
 
+  // Command palette ------------------------------------------------------
+  //
+  // The palette's `CommandContext` closes over the shell's existing
+  // operations (open/switch/close vault, create note, open note) + the
+  // theme handle App.tsx passes through. We rebuild on every render so
+  // the context always reflects current state; the `commands` array
+  // memoises on the values it actually depends on so cmdk doesn't see
+  // a new identity per keystroke.
+
+  const ctx = useMemo<CommandContext>(
+    () => ({
+      vault,
+      notes,
+      theme,
+      openVault: onSwitchVault,
+      switchVault: onSwitchVault,
+      closeVault: onCloseVault,
+      openNote: (path) => openNote(path),
+      createNote: () => handleNewNote(),
+      toggleTheme: onToggleTheme,
+      setTheme: onSetTheme,
+      openSearch: () => {
+        // Focus the rail's search box — the closest thing we have to a
+        // search surface until v0.3 #43 lands.
+        if (typeof document !== "undefined") {
+          const search = document.querySelector<HTMLInputElement>(
+            'input[type="search"][aria-label="Search notes"]',
+          );
+          search?.focus();
+        }
+      },
+      openSettings: () => {
+        setActiveNav("settings");
+      },
+      togglePalette: () => setPaletteOpen((prev) => !prev),
+      toast: (message, opts) => {
+        const kind = opts?.kind ?? "info";
+        const fn = kind === "error" ? toast.error : kind === "success" ? toast.success : toast.info;
+        fn(message, opts?.description ? { description: opts.description } : undefined);
+      },
+    }),
+    [
+      vault,
+      notes,
+      theme,
+      onSwitchVault,
+      onCloseVault,
+      onToggleTheme,
+      onSetTheme,
+      openNote,
+      handleNewNote,
+    ],
+  );
+
+  const commands = useMemo<AppCommand[]>(
+    () => [...builtInCommands(ctx), ...noteCommands(notes, ctx), ...getCommands()],
+    [ctx, notes],
+  );
+
+  // Global Mod+K listener (D2). Bound once at mount; the setter is a
+  // stable React state setter so the listener never sees a stale value.
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const isModK =
+        event.key.toLowerCase() === "k" && (isMacPlatform() ? event.metaKey : event.ctrlKey);
+      if (!isModK) return;
+      event.preventDefault();
+      setPaletteOpen((prev) => !prev);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const paletteShortcutLabel = useMemo(() => (isMacPlatform() ? "⌘K" : "Ctrl+K"), []);
+
   return (
     <div className="lattice-shell" data-active-nav={activeNav}>
       <Sidebar
@@ -265,6 +371,17 @@ export function WorkspaceShell(props: WorkspaceShellProps) {
       />
       <div className="flex min-w-0 flex-col">
         <div className="flex items-center justify-end gap-2 border-b border-border bg-bg-surface px-6 py-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPaletteOpen(true)}
+            aria-label="Open command palette"
+            title={`Command palette (${paletteShortcutLabel})`}
+            className="gap-2 text-text-secondary"
+          >
+            <TerminalSquare className="h-4 w-4" aria-hidden="true" />
+            <span className="font-mono text-xs">{paletteShortcutLabel}</span>
+          </Button>
           <Button variant="outline" size="sm" onClick={onSwitchVault}>
             Switch vault…
           </Button>
@@ -293,6 +410,12 @@ export function WorkspaceShell(props: WorkspaceShellProps) {
           <span>{selectedPath ?? `${notes.length} notes`}</span>
         </footer>
       </div>
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        commands={commands}
+        ctx={ctx}
+      />
     </div>
   );
 }
