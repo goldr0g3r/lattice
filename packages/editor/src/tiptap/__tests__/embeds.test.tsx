@@ -8,12 +8,19 @@
  * React node-view — i.e. `[data-mermaid]` / `[data-excalidraw]` appear
  * in the live DOM and the CodeMirror chrome (`.cm-editor`) does NOT.
  *
- * The Mermaid render itself is asynchronous and lazy (dynamic
- * `import("mermaid")` inside `useEffect`); the test only asserts the
- * wrapper exists, which is true the moment the React component mounts
- * (the placeholder is rendered immediately; the SVG arrives after the
- * dynamic import resolves). For the malformed-source case we wait for
- * the `[data-mermaid-error]` branch to settle (D5).
+ * Mermaid is **mocked** at the module level for two reasons:
+ *
+ *   1. Mermaid's real module graph is ~1 MB minified and famously slow
+ *      to evaluate inside jsdom (cold load is 10-30 s on a developer
+ *      laptop and even slower in CI). Mocking keeps the routing test
+ *      under a second per case so the CI matrix stays snappy.
+ *   2. We're asserting **dispatch routing** + the error branch (D5),
+ *      not Mermaid's parser correctness. The upstream `mermaid`
+ *      package owns its own parser tests.
+ *
+ * The malformed-source assertion drives the mock to
+ * `.mockRejectedValueOnce` so we exercise the error branch (D5)
+ * without depending on Mermaid's real grammar.
  *
  * Also asserts the CodeMirror fallback (the original PR #55 path) stays
  * bit-identical for non-embed info-strings (D1), so the dispatcher
@@ -28,6 +35,23 @@ import type { NoteDoc } from "@lattice/core-bindings";
 import { Editor } from "../Editor";
 import { isExcalidrawInfo, isMermaidInfo } from "../embeds";
 
+vi.mock("mermaid", () => ({
+  default: {
+    initialize: vi.fn(),
+    render: vi.fn().mockResolvedValue({
+      svg: "<svg data-mermaid-mock='ok'></svg>",
+      diagramType: "flowchart",
+    }),
+  },
+}));
+
+// Resolved lazily so the import order inside `MermaidEmbed`'s `useEffect`
+// gets the same mocked module the tests configure here.
+async function mermaidMock() {
+  const mod = await import("mermaid");
+  return vi.mocked(mod.default);
+}
+
 function fencedDoc(info: string, body: string): NoteDoc {
   return {
     frontmatter: { entries: [] },
@@ -36,7 +60,7 @@ function fencedDoc(info: string, body: string): NoteDoc {
 }
 
 describe("fenced-block embeds dispatcher", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     // TipTap touches ResizeObserver via @tiptap/react; jsdom doesn't ship it.
     if (!("ResizeObserver" in globalThis)) {
       class StubResizeObserver {
@@ -73,6 +97,17 @@ describe("fenced-block embeds dispatcher", () => {
         }),
       });
     }
+
+    // Reset the Mermaid mock to its default happy-path resolved value
+    // so each test starts from a known baseline regardless of any
+    // `.mockRejectedValueOnce` set up by a previous case.
+    const mermaid = await mermaidMock();
+    mermaid.render.mockReset();
+    mermaid.render.mockResolvedValue({
+      svg: "<svg data-mermaid-mock='ok'></svg>",
+      diagramType: "flowchart",
+    });
+    mermaid.initialize.mockReset();
   });
 
   afterEach(() => {
@@ -90,6 +125,10 @@ describe("fenced-block embeds dispatcher", () => {
     expect(container.querySelector("[data-info='mermaid']")).not.toBeNull();
     // CodeMirror fallback must NOT mount alongside the Mermaid view.
     expect(container.querySelector(".cm-editor")).toBeNull();
+    // Once the lazy import resolves the mock SVG should appear inline.
+    await waitFor(() => {
+      expect(container.querySelector("[data-mermaid-mock]")).not.toBeNull();
+    });
   });
 
   it("routes a ```excalidraw block to the placeholder card (D3)", async () => {
@@ -129,26 +168,29 @@ describe("fenced-block embeds dispatcher", () => {
   });
 
   it("surfaces a [data-mermaid-error] for malformed diagrams (D5)", async () => {
+    const mermaid = await mermaidMock();
+    mermaid.render.mockRejectedValueOnce(
+      new Error("Parse error on line 1: unexpected token 'oops'"),
+    );
+
     const { container } = render(
       <Editor
         initialDoc={fencedDoc("mermaid", "definitelyNotAValidDiagram --!! syntax oops\n")}
       />,
     );
 
-    await waitFor(
-      () => {
-        expect(container.querySelector("[data-mermaid-error]")).not.toBeNull();
-      },
-      { timeout: 8000 },
-    );
+    await waitFor(() => {
+      expect(container.querySelector("[data-mermaid-error]")).not.toBeNull();
+    });
     const errorBlock = container.querySelector<HTMLElement>("[data-mermaid-error]");
     expect(errorBlock?.textContent ?? "").toContain("Mermaid render failed");
+    expect(errorBlock?.textContent ?? "").toContain("unexpected token");
     // Raw source is shown in a sibling <pre><code> so the user can edit
     // it without scrolling away to find what they typed.
     expect(errorBlock?.querySelector("pre code")?.textContent ?? "").toContain(
       "definitelyNotAValidDiagram",
     );
-  }, 10000);
+  });
 
   it("exports info-string predicates the dispatcher uses (D1)", () => {
     expect(isMermaidInfo("mermaid")).toBe(true);
