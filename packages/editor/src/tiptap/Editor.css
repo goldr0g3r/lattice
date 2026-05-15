@@ -65,7 +65,6 @@
   padding: 0 var(--space-1);
 }
 
-.lattice-editor-prose pre[data-fenced],
 .lattice-editor-prose pre[data-html-block],
 .lattice-editor-prose pre[data-math="block"] {
   background: var(--color-muted);
@@ -77,9 +76,84 @@
   padding: var(--space-3) var(--space-4);
 }
 
-.lattice-editor-prose pre[data-fenced] code,
 .lattice-editor-prose pre[data-html-block] code,
 .lattice-editor-prose pre[data-math="block"] code {
+  background: transparent;
+  padding: 0;
+}
+
+/*
+ * Lattice CodeMirror 6 fenced block (v0.2 PR #3, issue #34).
+ *
+ * The TipTap node-view at `codemirror/node-view.ts` mounts a real CM6
+ * `EditorView` inside this wrapper, so the styles here only handle the
+ * outer `<pre>` chrome + the language-picker header. Syntax colours,
+ * gutter, and selection are owned by the CM6 theme at `codemirror/theme.ts`,
+ * which consumes the same `@lattice/ui/tokens.css` variables.
+ */
+.lattice-editor-prose pre[data-fenced].lattice-cm-fenced {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 0.375rem);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  margin: var(--space-4, 1rem) 0;
+  overflow: hidden;
+  padding: 0;
+  width: 100%;
+}
+
+.lattice-editor-prose pre[data-fenced].lattice-cm-fenced .lattice-cm-fenced__header {
+  align-items: center;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: var(--space-2, 0.5rem);
+  justify-content: flex-end;
+  padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem);
+}
+
+.lattice-editor-prose pre[data-fenced].lattice-cm-fenced .lattice-cm-fenced__language {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 0.25rem);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.lattice-editor-prose pre[data-fenced].lattice-cm-fenced .lattice-cm-fenced__host {
+  display: block;
+  width: 100%;
+}
+
+.lattice-editor-prose pre[data-fenced].lattice-cm-fenced .cm-editor {
+  background: var(--bg-elevated);
+  font-family: var(--font-mono);
+  max-width: 100%;
+  width: 100%;
+}
+
+.lattice-editor-prose pre[data-fenced].lattice-cm-fenced .cm-scroller {
+  font-family: var(--font-mono);
+}
+
+/*
+ * Fallback for the legacy `<pre><code>` rendering that still ships from
+ * `renderHTML` (used during SSR / copy-paste before the node-view mounts).
+ */
+.lattice-editor-prose pre[data-fenced]:not(.lattice-cm-fenced) {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 0.375rem);
+  font-family: var(--font-mono);
+  overflow-x: auto;
+  padding: 0.75rem 1rem;
+}
+
+.lattice-editor-prose pre[data-fenced]:not(.lattice-cm-fenced) code {
   background: transparent;
   padding: 0;
 }

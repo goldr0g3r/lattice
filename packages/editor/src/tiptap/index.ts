@@ -20,3 +20,20 @@ export { noteDocToProseMirror } from "./from-doc";
 export { proseMirrorToNoteDoc } from "./to-doc";
 export type { PMMark, PMNode } from "./from-doc";
 export { slashItems, type SlashItem } from "./slash-items";
+export {
+  PRELOADED_LANGUAGES,
+  LAZY_LANGUAGES,
+  LANGUAGE_ALIASES,
+  LAZY_ALIASES,
+  getLanguage,
+  getPreloadedLanguage,
+  languageMenuItems,
+  knownLanguageIds,
+  resolveCanonicalId,
+  normalizeInfo,
+  type LanguageFactory,
+  type LazyLanguageFactory,
+  type LanguageMenuItem,
+} from "./codemirror/languages";
+export { latticeCodeMirrorTheme } from "./codemirror/theme";
+export { latticeCodeMirrorNodeView } from "./codemirror/node-view";
