@@ -60,7 +60,6 @@ import {
 } from "../commands/registry";
 import { noteCommands } from "../commands/note-commands";
 import { CommandPalette } from "../components/CommandPalette";
-import { SearchModal } from "../components/SearchModal";
 import { EditorPane, type SaveStatus } from "./EditorPane";
 import { NoteList } from "./NoteList";
 import { Sidebar } from "./Sidebar";
@@ -149,7 +148,6 @@ export function WorkspaceShell(props: WorkspaceShellProps) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [pendingError, setPendingError] = useState<string | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestDocRef = useRef<NoteDoc | null>(null);
@@ -302,7 +300,16 @@ export function WorkspaceShell(props: WorkspaceShellProps) {
       createNote: () => handleNewNote(),
       toggleTheme: onToggleTheme,
       setTheme: onSetTheme,
-      openSearch: () => setSearchOpen(true),
+      openSearch: () => {
+        // Focus the rail's search box — the closest thing we have to a
+        // search surface until v0.3 #43 lands.
+        if (typeof document !== "undefined") {
+          const search = document.querySelector<HTMLInputElement>(
+            'input[type="search"][aria-label="Search notes"]',
+          );
+          search?.focus();
+        }
+      },
       openSettings: () => {
         setActiveNav("settings");
       },
