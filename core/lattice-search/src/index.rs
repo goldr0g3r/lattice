@@ -26,13 +26,12 @@ use tantivy::collector::Count;
 use tantivy::directory::MmapDirectory;
 use tantivy::query::AllQuery;
 use tantivy::schema::Schema;
-use tantivy::{Index as TantivyIndex, IndexReader, IndexWriter, ReloadPolicy, TantivyDocument, Term};
+use tantivy::{
+    Index as TantivyIndex, IndexReader, IndexWriter, ReloadPolicy, TantivyDocument, Term,
+};
 
 use crate::doc::IndexDoc;
 use crate::error::{SearchError, SearchResult};
-use crate::exec;
-use crate::hit::SearchResults;
-use crate::query::Query;
 use crate::schema::{build_schema, Fields, BODY_TOKENIZER, RAW_TOKENIZER, TITLE_TOKENIZER};
 
 /// Writer heap budget — 50 MB matches the Tantivy "single-thread small
@@ -235,24 +234,8 @@ impl Index {
         self.reader.searcher()
     }
 
-    /// Execute a parsed [`Query`] AST against the index and return the
-    /// top `limit` hits with snippet highlights. Snippets target the
-    /// `body` field; title-only matches return an empty snippet string
-    /// (the modal renders title + path as the secondary line in that
-    /// case).
-    ///
-    /// `limit` is clamped to [`SEARCH_LIMIT_MAX`] inside the executor —
-    /// callers can pass any `u32` without risking unbounded result
-    /// sets.
-    pub fn search(&self, query: &Query, limit: u32) -> SearchResult<SearchResults> {
-        exec::execute(&self.inner, &self.reader, self.fields, query, limit)
-    }
-
     fn verify_schema(found: &Schema, expected: &Schema) -> SearchResult<()> {
-        let found_fields: Vec<_> = found
-            .fields()
-            .map(|(_, e)| e.name().to_string())
-            .collect();
+        let found_fields: Vec<_> = found.fields().map(|(_, e)| e.name().to_string()).collect();
         let expected_fields: Vec<_> = expected
             .fields()
             .map(|(_, e)| e.name().to_string())
