@@ -68,4 +68,8 @@ test-results/
 /sandbox-vault/
 /.lattice/
 
+# Agent / worker scratch files (audits, snapshots, hand-off notes)
+.tmp-*.json
+.tmp-*.md
+
 

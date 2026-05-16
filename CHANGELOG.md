@@ -650,6 +650,45 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 - Workspace rule [`.cursor/rules/github-workflow.mdc`](.cursor/rules/github-workflow.mdc)
   reinforces `gh` CLI + Conventional Commits + squash-merge for v0.2+.
 
+### Changed
+
+- **Repository cleanup — reverted three direct-to-main commits that bypassed the
+  PR contract.** On 2026-05-16, three commits landed on `main` without going
+  through the squash-merge + CI + branch-protection workflow documented in
+  [`.cursor/rules/github-workflow.mdc`](.cursor/rules/github-workflow.mdc) and
+  [ADR-0009](docs/decisions/0009-conventional-commits-trunk-based.md):
+  `7b0ada1` (a `feat(ui)` commit whose actual diff was 31 net-new docs files,
+  not styling), `2d12227` (a `feat(search)` slice for issue
+  [#43](https://github.com/goldr0g3r/lattice/issues/43) including stray
+  `.commit-msg.txt` / `.pr-body.md` scratch files), and merge commit `20bfbd9`
+  that joined them onto `main`. `chore/repo-cleanup` reverts all three via
+  `git revert -m 1 20bfbd9` followed by `git revert 2d12227`, restoring `main`
+  to the tree of [`0ef5565`](https://github.com/goldr0g3r/lattice/commit/0ef5565)
+  (the canonical PR #66). The legitimate work behind the reverted commits is
+  preserved as annotated tags
+  [`salvage/docs-content-7b0ada1`](https://github.com/goldr0g3r/lattice/releases/tag/salvage%2Fdocs-content-7b0ada1)
+  and
+  [`salvage/search-modal-2d12227`](https://github.com/goldr0g3r/lattice/releases/tag/salvage%2Fsearch-modal-2d12227)
+  so it can be re-shipped through proper PRs (issue #43 is owned by the
+  v0.3 milestone owner). Branch protection on `main` was re-applied via
+  `node .github/scripts/bootstrap-repo.mjs --apply-protection` to confirm
+  the contract is in place; the underlying reason direct pushes were possible
+  is `enforce_admins: false` in the bootstrap script — flagged for follow-up
+  hardening.
+- Stale local branches `feat/command-palette-rebase` (1 stale dup of PR
+  [#59](https://github.com/goldr0g3r/lattice/pull/59)) and
+  `feat/shell-visual-polish` (1 stale dup of PR
+  [#66](https://github.com/goldr0g3r/lattice/pull/66) on a pre-search base)
+  pruned locally; their unique commits were verified as functional duplicates
+  of the canonical squashed counterparts already on `main`. Seven of nine
+  stashes from yesterday's worker hand-offs dropped after verifying their
+  contents had shipped via PRs #55, #57, #59, #61, #66; two stashes preserved
+  (`stash@{1}` adds 7 docs files not on `main`; `stash@{2}` adds
+  `docs/development/coding-standards.md` not on `main`).
+- `.gitignore` adds `.tmp-*.json` and `.tmp-*.md` patterns so future agent
+  audits and snapshots don't pollute `git status` for concurrent workers
+  sharing a worktree.
+
 ## [0.1.0] - 2026-05-14
 
 > Foundation release. Tagged from `main` commit `d51ad77` (perf baselines)
