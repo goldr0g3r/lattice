@@ -24,12 +24,16 @@
 
 mod doc;
 mod error;
+mod exec;
+mod hit;
 mod index;
 pub mod query;
 mod schema;
 
 pub use doc::IndexDoc;
 pub use error::{SearchError, SearchResult};
+pub use exec::{lower as lower_query, SEARCH_LIMIT_MAX};
+pub use hit::{SearchHit, SearchResults};
 pub use index::{drop_index_dir, Index, IndexStats};
 pub use query::{
     parse as parse_query, DateOp, Query, DEFAULT_FIELDS, DEFAULT_FUZZY_DISTANCE, TITLE_BOOST,

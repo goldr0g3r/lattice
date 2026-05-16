@@ -217,16 +217,14 @@ export function builtInCommands(ctx: CommandContext): AppCommand[] {
       label: "Search notes",
       keywords: ["find", "lookup", "grep"],
       group: "View",
+      shortcut: "⌘P",
       icon: Search,
-      // Stub until v0.3 #43 ships full-text search. The note-list rail
-      // already has substring filter — point users at it for now.
-      run: (c) => {
-        c.openSearch();
-        c.toast("Search ships in v0.3", {
-          description: "For now, use the search box in the Notes rail.",
-          kind: "info",
-        });
-      },
+      // v0.3 PR E (#43) shipped the search modal; `openSearch` now
+      // opens it (the rail still has its substring filter for
+      // browse-style workflows). Earlier versions of this command
+      // toasted "Search ships in v0.3" as a stub — see PR #59
+      // commit message for the history.
+      run: (c) => c.openSearch(),
     },
     {
       id: "view.theme",

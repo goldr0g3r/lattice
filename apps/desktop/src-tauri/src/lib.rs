@@ -44,6 +44,7 @@ pub fn run() {
             commands::notes::note_read,
             commands::notes::note_write,
             commands::notes::note_create,
+            commands::search::search_query,
             commands::system::cold_start_ms,
             commands::system::core_version,
             commands::system::telemetry_settings_get,

@@ -7,12 +7,22 @@
 //! | `id`    | `String`            | yes    | yes     | `raw`           |
 //! | `path`  | `String`            | yes    | yes     | `raw`           |
 //! | `title` | `String`            | yes    | yes     | `default` (lc)  |
-//! | `body`  | `String`            | no     | yes     | `en_stem`       |
+//! | `body`  | `String`            | yes    | yes     | `en_stem`       |
 //! | `tags`  | `Vec<String>`       | yes    | yes     | `raw` (multi)   |
 //!
 //! `id` is `STRING` (raw tokenizer) so `delete_term(Term::from_field_text(id, doc_id))`
 //! matches exactly without lowercasing or splitting on whitespace — required
 //! for the replace-on-save path the v0.3 PR C watcher integration uses.
+//!
+//! `body` is **stored as well as indexed** so Tantivy's `SnippetGenerator`
+//! can build highlighted excerpts for the v0.3 PR E search modal without
+//! re-reading the source `.md` file. The size hit is real (≈ doubles the
+//! body's on-disk footprint vs. inverted-only), but on a 10k-note vault
+//! that's ≈ 5 MB extra — well inside the 200 MB memory budget from
+//! ARCHITECTURE.md. We hash the body in SQLite (`notes.body_hash`) so
+//! drift between the stored Tantivy copy and the canonical `.md` file
+//! can be detected and resolved by a full reindex (per ADR-0004's
+//! "rebuildable cache" promise).
 //!
 //! `body` uses the English stemmer so `running` and `runs` retrieve the
 //! same documents; `title` does not stem so users get exact-title matches
@@ -68,20 +78,24 @@ pub fn build_schema() -> (Schema, Fields) {
 
     let title = builder.add_text_field(
         "title",
-        TextOptions::default().set_stored().set_indexing_options(
-            TextFieldIndexing::default()
-                .set_tokenizer(TITLE_TOKENIZER)
-                .set_index_option(IndexRecordOption::WithFreqsAndPositions),
-        ),
+        TextOptions::default()
+            .set_stored()
+            .set_indexing_options(
+                TextFieldIndexing::default()
+                    .set_tokenizer(TITLE_TOKENIZER)
+                    .set_index_option(IndexRecordOption::WithFreqsAndPositions),
+            ),
     );
 
     let body = builder.add_text_field(
         "body",
-        TextOptions::default().set_indexing_options(
-            TextFieldIndexing::default()
-                .set_tokenizer(BODY_TOKENIZER)
-                .set_index_option(IndexRecordOption::WithFreqsAndPositions),
-        ),
+        TextOptions::default()
+            .set_stored()
+            .set_indexing_options(
+                TextFieldIndexing::default()
+                    .set_tokenizer(BODY_TOKENIZER)
+                    .set_index_option(IndexRecordOption::WithFreqsAndPositions),
+            ),
     );
 
     let tags = builder.add_text_field(

@@ -5,5 +5,6 @@
 //! only handles the Tauri-specific glue (dialogs, windows, system info).
 
 pub mod notes;
+pub mod search;
 pub mod system;
 pub mod vault;
