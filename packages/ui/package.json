@@ -47,9 +47,9 @@
   "devDependencies": {
     "@lattice/tsconfig-preset": "workspace:*",
     "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react-dom": "^19.2.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.2.6",
     "typescript": "~5.7.2",
     "vitest": "^2.1.8"
   }
