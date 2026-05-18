@@ -78,7 +78,7 @@
     "micromark-extension-frontmatter": "^2.0.0",
     "micromark-extension-gfm": "^3.0.0",
     "micromark-extension-math": "^3.1.0",
-    "react": "^18.3.1",
+    "react": "^19.2.6",
     "react-dom": "^18.3.1",
     "tippy.js": "^6.3.7",
     "yaml": "^2.6.1"
@@ -88,7 +88,7 @@
     "@testing-library/react": "^16.1.0",
     "@types/katex": "^0.16.8",
     "@types/mdast": "^4.0.4",
-    "@types/react": "^18.3.18",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^18.3.5",
     "jsdom": "^25.0.1",
     "typescript": "~5.7.2",
