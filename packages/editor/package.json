@@ -55,7 +55,7 @@
     "@excalidraw/excalidraw": "^0.18.1",
     "@lattice/core-bindings": "workspace:*",
     "@tiptap/core": "^2.10.3",
-    "@tiptap/extension-code-block": "^2.10.3",
+    "@tiptap/extension-code-block": "^3.23.4",
     "@tiptap/extension-link": "^2.10.3",
     "@tiptap/extension-placeholder": "^2.10.3",
     "@tiptap/extension-table": "^2.10.3",
