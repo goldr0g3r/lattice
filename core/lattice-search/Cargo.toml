@@ -22,7 +22,7 @@ ts-rs = { version = "10", features = ["chrono-impl"] }
 
 [dev-dependencies]
 tempfile = "3.14"
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.8", features = ["html_reports"] }
 anyhow = { workspace = true }
 
 [[bench]]
