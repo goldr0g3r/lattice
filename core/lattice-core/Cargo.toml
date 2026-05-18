@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "lattice-core"
 description = "Lattice core: vault FS, Markdown parser, SQLite index, file watcher, error model."
 version.workspace = true
@@ -28,7 +28,7 @@ sqlx = { version = "0.8", default-features = false, features = [
     "uuid",
 ] }
 ts-rs = { version = "10", features = ["chrono-impl", "uuid-impl"] }
-dirs = "5.0"
+dirs = "6.0"
 notify = "7"
 notify-debouncer-full = "0.4"
 tracing-appender = "0.2"
