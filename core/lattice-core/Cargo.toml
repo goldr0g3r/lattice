@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "lattice-core"
 description = "Lattice core: vault FS, Markdown parser, SQLite index, file watcher, error model."
 version.workspace = true
@@ -35,7 +35,7 @@ tracing-appender = "0.2"
 tracing-subscriber = { workspace = true }
 pulldown-cmark = { version = "0.12", default-features = false }
 serde_yaml_ng = "0.10"
-sha2 = "0.10"
+sha2 = "0.11"
 lattice-search = { path = "../lattice-search" }
 
 [dev-dependencies]
