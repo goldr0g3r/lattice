@@ -37,7 +37,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
     "lucide-react": "^0.469.0",
-    "sonner": "^1.7.1",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^2.6.0"
   },
   "peerDependencies": {
