@@ -41,7 +41,7 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Linux Tauri/Webkit prerequisites
         if: runner.os == 'Linux'
